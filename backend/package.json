@@ -1,0 +1,14 @@
+{
+  "name": "her-words-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Poetry website with Node API publishing",
+  "main": "server.js",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pg": "^8.12.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}

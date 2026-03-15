@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Poet - Your Name</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --parchment: #f5f0e8;
+    --dust: #e8e0d0;
+    --gold: #b89a6a;
+    --rose: #c4887a;
+    --sage: #7a9070;
+    --muted: #8a7f72;
+    --paper: #faf7f2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.4rem 4rem;
+    background: rgba(250,247,242,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(184,154,106,0.15);
+    transition: padding .3s;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    letter-spacing: .18em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(184,154,106,0.35);
+    background: transparent;
+    color: var(--ink);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .nav-toggle .bar {
+    width: 18px;
+    height: 1px;
+    background: currentColor;
+    margin: 3px 0;
+    display: block;
+    transition: transform .22s ease, opacity .2s ease;
+    transform-origin: center;
+  }
+  nav.nav-open .nav-toggle .bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  nav.nav-open .nav-toggle .bar:nth-child(2) {
+    opacity: 0;
+  }
+  nav.nav-open .nav-toggle .bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+  .nav-links { display: flex; gap: 2.8rem; list-style: none; }
+  .nav-links a {
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .25s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0; right: 0;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform .3s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: .55rem 1.4rem;
+    text-decoration: none;
+    transition: background .25s;
+  }
+  .nav-cta:hover { background: var(--gold); }
+
+  /* HERO */
+  #home {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 4rem 6rem 6rem;
+  }
+  .hero-eyebrow {
+    font-size: .68rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.8rem;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 5vw, 6rem);
+    font-weight: 300;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    letter-spacing: -.01em;
+  }
+  .hero-title em { font-style: italic; color: var(--rose); }
+  .hero-sub {
+    font-size: .95rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 400px;
+    margin-bottom: 2.8rem;
+  }
+  .hero-actions { display: flex; gap: 1.2rem; align-items: center; }
+  .btn-primary {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    padding: .9rem 2rem;
+    text-decoration: none;
+    transition: all .25s;
+    border: 1px solid var(--ink);
+  }
+  .btn-primary:hover { background: var(--gold); border-color: var(--gold); }
+  .btn-ghost {
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    transition: color .25s;
+  }
+  .btn-ghost:hover { color: var(--rose); }
+  .btn-ghost .arrow { font-size: 1rem; transition: transform .25s; }
+  .btn-ghost:hover .arrow { transform: translateX(4px); }
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+    background: var(--dust);
+  }
+  .hero-poem-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--paper);
+    padding: 3rem;
+    max-width: 340px;
+    width: 90%;
+    box-shadow: 0 24px 80px rgba(26,20,16,.12);
+    border-top: 3px solid var(--gold);
+  }
+  .poem-label {
+    font-size: .6rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .poem-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 1.2rem;
+    font-style: italic;
+  }
+  .poem-lines {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    line-height: 2;
+    color: var(--muted);
+    border-left: 2px solid var(--dust);
+    padding-left: 1.2rem;
+    font-style: italic;
+  }
+  .poem-read-more {
+    display: block;
+    margin-top: 1.5rem;
+    font-size: .65rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--rose);
+    text-decoration: none;
+  }
+  .hero-texture {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(circle at 30% 70%, rgba(196,136,122,.08) 0%, transparent 60%),
+                      radial-gradient(circle at 80% 20%, rgba(122,144,112,.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* SECTION SHARED */
+  section { padding: 7rem 6rem; }
+  .section-label {
+    font-size: .65rem;
+    letter-spacing: .38em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 3vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .section-sub {
+    font-size: .9rem;
+    color: var(--muted);
+    line-height: 1.85;
+    max-width: 520px;
+    margin-bottom: 3rem;
+  }
+
+  /* POEMS */
+  #poems { background: var(--parchment); }
+  .filter-bar { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 3rem; }
+  .filter-btn {
+    font-size: .65rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: .5rem 1.2rem;
+    border: 1px solid var(--dust);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'Jost', sans-serif;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .poems-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .author-studio {
+    background: var(--paper);
+    border: 1px solid var(--dust);
+    padding: 1.6rem;
+    margin-bottom: 2rem;
+  }
+  .author-studio h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+    font-weight: 400;
+  }
+  .author-studio p {
+    color: var(--muted);
+    font-size: .85rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  .author-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .9rem;
+  }
+  .author-form .full { grid-column: 1 / -1; }
+  .author-form input,
+  .author-form textarea,
+  .author-form select {
+    width: 100%;
+    border: 1px solid var(--dust);
+    background: #fff;
+    padding: .75rem .8rem;
+    font: inherit;
+    color: var(--ink);
+  }
+  .author-form textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .author-form-actions {
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    margin-top: .3rem;
+  }
+  .author-status {
+    font-size: .78rem;
+    color: var(--sage);
+  }
+  .subscriber-panel {
+    border-top: 1px solid var(--dust);
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+  }
+  .subscriber-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .8rem;
+    margin-bottom: .8rem;
+  }
+  .subscriber-count {
+    font-size: .78rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .subscriber-list {
+    list-style: none;
+    border: 1px solid var(--dust);
+    max-height: 220px;
+    overflow-y: auto;
+    background: #fff;
+  }
+  .subscriber-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: .8rem;
+    padding: .6rem .75rem;
+    border-bottom: 1px solid var(--dust);
+    font-size: .78rem;
+    color: var(--muted);
+  }
+  .subscriber-list li:last-child {
+    border-bottom: 0;
+  }
+  .subscriber-status {
+    margin-top: .6rem;
+    font-size: .76rem;
+    color: var(--sage);
+  }
+  .poem-card.user-post {
+    border-left: 3px solid var(--gold);
+  }
+  @media (max-width: 960px) {
+    .poems-grid { grid-template-columns: repeat(2, 1fr); }
+    .author-form { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .poems-grid { grid-template-columns: 1fr; }
+  }
+  .poem-card {
+    background: var(--paper);
+    padding: 2.2rem;
+    border-bottom: 2px solid transparent;
+    transition: all .3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .poem-card:hover {
+    border-bottom-color: var(--rose);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(26,20,16,.08);
+  }
+  .poem-card-tag {
+    font-size: .6rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: .8rem;
+  }
+  .poem-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: .8rem;
+    line-height: 1.2;
+  }
+  .poem-card-excerpt {
+    font-size: .85rem;
+    line-height: 1.85;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .poem-card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: .62rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* COLLECTIONS */
+  #collections { background: var(--ink); color: var(--paper); }
+  #collections .section-title { color: var(--paper); }
+  #collections .section-sub { color: rgba(250,247,242,.55); }
+  .collections-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .collection-card {
+    border: 1px solid rgba(250,247,242,.12);
+    padding: 2.5rem 1.8rem;
+    transition: all .3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .collection-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s;
+  }
+  .collection-card:hover::before { transform: scaleX(1); }
+  .collection-card:hover { border-color: rgba(250,247,242,.25); }
+  .coll-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: rgba(184,154,106,.2);
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+  .coll-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: .6rem;
+    color: var(--paper);
+  }
+  .coll-count {
+    font-size: .6rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(250,247,242,.4);
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 6rem;
+    align-items: center;
+    padding: 7rem 6rem;
+  }
+  .about-image-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+  .about-image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    background: var(--dust);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 22%,
+      rgba(0, 0, 0, 1) 78%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 22%,
+      rgba(0, 0, 0, 1) 78%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+  .about-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(250, 247, 242, 0.28) 0%,
+      rgba(250, 247, 242, 0) 30%,
+      rgba(250, 247, 242, 0) 70%,
+      rgba(250, 247, 242, 0.35) 100%
+    );
+  }
+  .about-image-accent {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 60%;
+    height: 60%;
+    border: 2px solid var(--gold);
+    z-index: -1;
+  }
+  .about-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--rose);
+    margin-bottom: 2rem;
+    padding-left: 1.5rem;
+    border-left: 3px solid var(--rose);
+  }
+  .about-body {
+    font-size: .9rem;
+    line-height: 2;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .about-themes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: 2rem;
+  }
+  .theme-pill {
+    font-size: .62rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: .4rem 1rem;
+    border: 1px solid var(--dust);
+    color: var(--muted);
+  }
+
+  /* SPOKEN WORD */
+  #spoken { background: var(--parchment); }
+  .spoken-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  .spoken-card {
+    background: var(--paper);
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    transition: box-shadow .3s;
+    cursor: pointer;
+  }
+  .spoken-card:hover { box-shadow: 0 8px 30px rgba(26,20,16,.08); }
+  .play-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    transition: background .25s;
+  }
+  .spoken-card:hover .play-btn { background: var(--rose); }
+  .spoken-info h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    margin-bottom: .3rem;
+  }
+  .spoken-info span {
+    font-size: .65rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* NEWSLETTER */
+  #newsletter {
+    background: var(--rose);
+    color: var(--paper);
+    text-align: center;
+    padding: 6rem;
+  }
+  #newsletter .section-label { color: rgba(250,247,242,.7); }
+  #newsletter .section-title { color: var(--paper); max-width: 600px; margin: 0 auto 1rem; }
+  #newsletter .section-sub { color: rgba(250,247,242,.75); margin: 0 auto 2.5rem; }
+  .newsletter-form {
+    display: flex;
+    max-width: 440px;
+    margin: 0 auto;
+    gap: 0;
+  }
+  .newsletter-form input {
+    flex: 1;
+    padding: .9rem 1.2rem;
+    border: none;
+    background: rgba(250,247,242,.2);
+    color: var(--paper);
+    font-family: 'Jost', sans-serif;
+    font-size: .85rem;
+    outline: none;
+  }
+  .newsletter-form input::placeholder { color: rgba(250,247,242,.55); }
+  .newsletter-form button {
+    padding: .9rem 1.5rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'Jost', sans-serif;
+    font-size: .65rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .25s;
+  }
+  .newsletter-form button:hover { background: rgba(26,20,16,.7); }
+
+  /* EVENTS */
+  #events {}
+  .events-list { max-width: 700px; }
+  .event-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.8rem 0;
+    border-bottom: 1px solid var(--dust);
+  }
+  .event-date { text-align: center; }
+  .event-date .day {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--gold);
+  }
+  .event-date .month {
+    font-size: .6rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .event-info h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    margin-bottom: .3rem;
+  }
+  .event-info p {
+    font-size: .78rem;
+    color: var(--muted);
+    letter-spacing: .05em;
+  }
+  .event-tag {
+    font-size: .6rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: .35rem .9rem;
+    border: 1px solid var(--sage);
+    color: var(--sage);
+    white-space: nowrap;
+  }
+
+  /* CONTACT */
+  #contact {
+    background: var(--ink);
+    color: var(--paper);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    padding: 7rem 6rem;
+  }
+  #contact .section-title { color: var(--paper); }
+  #contact .section-sub { color: rgba(250,247,242,.55); }
+  .contact-details { margin-top: 2rem; }
+  .contact-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+  }
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(184,154,106,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+  .contact-item p { font-size: .85rem; color: rgba(250,247,242,.6); line-height: 1.6; }
+  .socials { display: flex; gap: 1rem; margin-top: 2.5rem; }
+  .social-link {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(250,247,242,.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(250,247,242,.6);
+    text-decoration: none;
+    font-size: .75rem;
+    transition: all .25s;
+  }
+  .social-link:hover { border-color: var(--gold); color: var(--gold); }
+  .social-link svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+    fill: currentColor;
+  }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label {
+    display: block;
+    font-size: .62rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: rgba(250,247,242,.4);
+    margin-bottom: .5rem;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: rgba(250,247,242,.06);
+    border: 1px solid rgba(250,247,242,.12);
+    padding: .9rem 1rem;
+    color: var(--paper);
+    font-family: 'Jost', sans-serif;
+    font-size: .85rem;
+    outline: none;
+    transition: border-color .25s;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { height: 120px; resize: none; }
+  .form-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    font-family: 'Jost', sans-serif;
+    font-size: .68rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .25s;
+    margin-top: .5rem;
+  }
+  .form-submit:hover { background: var(--rose); color: var(--paper); }
+
+  /* FOOTER */
+  footer {
+    background: #120e0a;
+    color: rgba(250,247,242,.35);
+    text-align: center;
+    padding: 2.5rem;
+    font-size: .65rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+  footer span { color: var(--gold); }
+
+  /* SCROLL ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    nav {
+      padding: 1rem 1.5rem;
+      flex-wrap: wrap;
+      gap: .9rem;
+    }
+    .nav-links {
+      order: 3;
+      width: 100%;
+      gap: 1.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    #home {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      padding-top: 130px;
+    }
+    .hero-left {
+      padding: 3.5rem 1.5rem 2rem;
+    }
+    .hero-right {
+      min-height: 60vh;
+    }
+    .hero-poem-card {
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
+      margin: 2rem auto;
+      max-width: 620px;
+      width: calc(100% - 3rem);
+    }
+    section {
+      padding: 5rem 1.5rem;
+    }
+    .collections-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #about,
+    #contact {
+      grid-template-columns: 1fr;
+      gap: 2.2rem;
+      padding: 5rem 1.5rem;
+    }
+    .spoken-grid {
+      grid-template-columns: 1fr;
+    }
+    #newsletter {
+      padding: 4.5rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .nav-links a {
+      font-size: .62rem;
+      letter-spacing: .16em;
+    }
+    .nav-cta {
+      margin-left: auto;
+      font-size: .62rem;
+      padding: .5rem 1rem;
+    }
+    .hero-eyebrow {
+      letter-spacing: .2em;
+    }
+    .hero-title {
+      font-size: clamp(2.2rem, 11vw, 3rem);
+      line-height: 1.08;
+    }
+    .hero-sub {
+      font-size: .88rem;
+      line-height: 1.75;
+      margin-bottom: 1.8rem;
+    }
+    .hero-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .7rem;
+    }
+    .hero-actions a {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+    }
+    .btn-primary,
+    .btn-ghost {
+      font-size: .64rem;
+      letter-spacing: .16em;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 9vw, 2.4rem);
+    }
+    .section-sub {
+      font-size: .85rem;
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+    .filter-bar {
+      gap: .55rem;
+      margin-bottom: 2rem;
+    }
+    .filter-btn {
+      font-size: .56rem;
+      letter-spacing: .14em;
+      padding: .45rem .75rem;
+    }
+    .author-studio {
+      padding: 1rem;
+    }
+    .author-form-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .author-form-actions button {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+    .subscriber-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .subscriber-list li {
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .poem-card,
+    .spoken-card,
+    .collection-card {
+      padding: 1.4rem;
+    }
+    .poem-card-title {
+      font-size: 1.3rem;
+    }
+    .collections-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-quote {
+      font-size: 1.25rem;
+      padding-left: .9rem;
+    }
+    .theme-pill {
+      font-size: .56rem;
+      letter-spacing: .14em;
+      padding: .35rem .7rem;
+    }
+    .newsletter-form {
+      flex-direction: column;
+      gap: .65rem;
+      max-width: none;
+    }
+    .newsletter-form input,
+    .newsletter-form button {
+      width: 100%;
+    }
+    .event-item {
+      grid-template-columns: 1fr;
+      gap: .75rem;
+      align-items: flex-start;
+    }
+    .event-date {
+      text-align: left;
+      display: flex;
+      align-items: baseline;
+      gap: .55rem;
+    }
+    .event-date .day {
+      font-size: 1.8rem;
+    }
+    .event-tag {
+      margin-top: .25rem;
+    }
+    footer {
+      font-size: .55rem;
+      letter-spacing: .1em;
+      padding: 1.4rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    nav {
+      align-items: center;
+      padding: .9rem 1rem;
+      gap: .6rem;
+    }
+    .nav-toggle {
+      display: inline-flex;
+      margin-left: auto;
+    }
+    .nav-cta {
+      display: none;
+    }
+    .nav-links {
+      display: none;
+      order: 4;
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      background: var(--paper);
+      border: 1px solid rgba(184,154,106,0.2);
+      margin-top: .4rem;
+    }
+    nav.nav-open .nav-links {
+      display: flex;
+    }
+    .nav-links li + li {
+      border-top: 1px solid rgba(184,154,106,0.15);
+    }
+    .nav-links a {
+      display: block;
+      padding: .85rem .9rem;
+      font-size: .68rem;
+      letter-spacing: .16em;
+    }
+    .nav-links a::after {
+      display: none;
+    }
+    #home {
+      padding-top: 95px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <a class="nav-logo" href="#home">Mutashi<tspan>Writes</span></a>
+  <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="#poems">Poems</a></li>
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="#newsletter">Subscribe</a>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Poet &middot; Storyteller &middot; Voice</p>
+    <h1 class="hero-title">
+      Mutashi Writes<br>
+      <em>You read and feel</em><br>
+      everything.
+    </h1>
+    <p class="hero-sub">
+      Mutashi writes from the marrow - on love, loss,
+      healing, and the sacred ordinary. Welcome to where language
+      becomes breath.
+    </p>
+    <div class="hero-actions">
+      <a href="#poems" class="btn-primary">Read the Poems</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-texture"></div>
+    <div class="hero-poem-card">
+      <p class="poem-label">&#10022; Featured Poem</p>
+      <h2 class="poem-title">Nabayet - Otile Brown</h2>
+      <div class="poem-lines">
+        Nimejaliwa moyo wa upendo<br>
+Nikipenda napendaga vibaya<br>
+Ila scandal zimefanya sija settle<br>
+Madem wananihukumu vibaya<br>
+
+Nishabadili ata Mienendo<br>
+Wanadai nimefulia ile mbaya<br>
+Mana sifanyi kiki tena na scandal<br>
+Sina hamu nazo kisa wewe mama<br>
+      </div>
+      <a href="#poems" class="poem-read-more">Read full poem &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- POEMS -->
+<section id="poems">
+  <div class="fade-up">
+    <p class="section-label">&#10022; The Library</p>
+    <h2 class="section-title">All Poems</h2>
+    <p class="section-sub">Every word a door. Browse by theme, or let yourself wander.</p>
+  </div>
+
+  <div class="author-studio fade-up">
+    <h3>Author Studio</h3>
+    <p>Write and publish directly from this page. Shared mode: <strong id="backend-mode">Local only</strong>.</p>
+    <form class="author-form" id="author-form">
+      <input type="text" id="author-title" placeholder="Poem title" required>
+      <select id="author-theme" required>
+        <option value="">Select theme</option>
+        <option>Love</option>
+        <option>Healing</option>
+
+        <option>Identity</option>
+        <option>Spiritual</option>
+        <option>Loss</option>
+        <option>Growth</option>
+      </select>
+      <textarea class="full" id="author-excerpt" placeholder="Write a short excerpt..." required></textarea>
+      <input type="text" id="author-read-time" placeholder="Read time (e.g. 2 min read)" value="2 min read" required>
+      <div class="author-form-actions full">
+        <button class="btn-primary" type="submit">Publish</button>
+        <button class="btn-ghost" type="button" id="clear-posts">Clear Saved Posts</button>
+        <span class="author-status" id="author-status"></span>
+      </div>
+    </form>
+    <div class="subscriber-panel">
+      <div class="subscriber-head">
+        <p class="subscriber-count">Subscribers: <strong id="subscriber-count">0</strong></p>
+        <button class="btn-ghost" type="button" id="refresh-subscribers">Refresh Subscribers</button>
+      </div>
+      <ul class="subscriber-list" id="subscriber-list">
+        <li>No subscribers yet.</li>
+      </ul>
+      <p class="subscriber-status" id="subscriber-status"></p>
+    </div>
+  </div>
+
+  <div class="filter-bar fade-up">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Love</button>
+    <button class="filter-btn">Healing</button>
+    <button class="filter-btn">Identity</button>
+    <button class="filter-btn">Spiritual</button>
+    <button class="filter-btn">Loss</button>
+    <button class="filter-btn">Growth</button>
+  </div>
+
+  <div class="poems-grid fade-up">
+    <a class="poem-card" href="#">
+      <p class="poem-card-tag">Healing</p>
+      <h3 class="poem-card-title">After the Storm, I Made Tea</h3>
+      <p class="poem-card-excerpt">I didn't know healing looked like this - quiet, ordinary, steam rising from a cup while the world outside forgot to stop...</p>
+      <div class="poem-card-meta"><span>Feb 14, 2025</span><span>2 min read</span></div>
+    </a>
+    
+    <a class="poem-card" href="#">
+      <p class="poem-card-tag">Identity</p>
+      <h3 class="poem-card-title">The Name I Chose for Myself</h3>
+      <p class="poem-card-excerpt">not the name they pinned on me at birth - a different one, earned in the dark, the one that fits the shape of my becoming...</p>
+      <div class="poem-card-meta"><span>Jan 10, 2025</span><span>2 min read</span></div>
+    </a>
+    <a class="poem-card" href="#">
+      <p class="poem-card-tag">Love</p>
+      <h3 class="poem-card-title">I love her again - Jcole</h3>
+      <p class="poem-card-excerpt">Back when I was just a jit hangin' on thе strip (Boom)<br>
+She's the girl that I would see in evеry nigga's whip (Boom)<br>
+I was much too young to truly know what constitutes<br>
+The difference 'tween the girl next door and or a prostitute (Yeah)<br>
+I heard some older brothers say they knew her from before<br>
+She lost her common sense when niggas</p>
+      <div class="poem-card-meta"><span>Dec 31, 2024</span><span>2 min read</span></div>
+    </a>
+    <a class="poem-card" href="#">
+      <p class="poem-card-tag">Spiritual</p>
+      <h3 class="poem-card-title">Reincarnated by Kendrick Lamar</h3>
+      <p class="poem-card-excerpt">I got this fire burnin' in me from within<br>
+Concentrated thoughts on who I used to be, I'm sheddin' skin
+Every day, a new version of me, a third of me demented, cemented in pain
+Juggling the pros and cons of fame
+I don't know how to make friends, I'm a lonely soul
+I recollect this isolation, I was four years old
+Truth be told, I've been battling myself
+Tryna navigate the real and fake</p>
+      <div class="poem-card-meta"><span>Dec 18, 2024</span><span>3 min read</span></div>
+    </a>
+    <a class="poem-card" href="#">
+      <p class="poem-card-tag">Loss</p>
+      <h3 class="poem-card-title">What Grief Taught Me to Keep</h3>
+      <p class="poem-card-excerpt">grief is a hoarder - it keeps everything: the way you laughed, the specific weight of your absence on a Tuesday afternoon...</p>
+      <div class="poem-card-meta"><span>Nov 29, 2024</span><span>4 min read</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- COLLECTIONS -->
+<section id="collections">
+  <div class="fade-up">
+    <p class="section-label">&#10022; Curated</p>
+    <h2 class="section-title">Collections</h2>
+    <p class="section-sub">Poems grouped by the seasons they were born in.</p>
+  </div>
+  <div class="collections-grid fade-up">
+    <div class="collection-card"><p class="coll-number">01</p><h3 class="coll-title">Letters I Never Sent</h3><p class="coll-count">12 poems</p></div>
+    <div class="collection-card"><p class="coll-number">03</p><h3 class="coll-title">Becoming</h3><p class="coll-count">15 poems</p></div>
+    <div class="collection-card"><p class="coll-number">04</p><h3 class="coll-title">Healing After</h3><p class="coll-count">10 poems</p></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-image-wrap fade-up">
+    <img class="about-image" src="portrait.jpg" alt="Portrait photo">
+    <div class="about-image-accent"></div>
+  </div>
+  <div class="fade-up">
+    <p class="section-label">&#10022; The Poet</p>
+    <h2 class="section-title">About Me</h2>
+    <blockquote class="about-quote">
+      "I am Mutashi — a poet, a thinker, a feeler of deep things"
+    </blockquote>
+    <p class="about-body">
+      I write to make sense of the world and the emotions that move through it.
+    </p>
+    <p class="about-body">
+      Through words, he explores love, healing, identity, and the beauty of becoming. 
+      His poetry is a sanctuary — a place where vulnerability is strength and every feeling has a voice. Each piece is an invitation to pause, reflect, 
+      and reconnect with the parts of ourselves we often leave unspoken.
+    </p>
+    <div class="about-themes">
+      <span class="theme-pill">Love</span>
+      <span class="theme-pill">Healing</span>
+      
+      <span class="theme-pill">Identity</span>
+      <span class="theme-pill">Spiritual</span>
+      <span class="theme-pill">Growth</span>
+    </div>
+  </div>
+</section>
+
+<!-- SPOKEN WORD -->
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <p class="section-label">&#10022; Stay Close</p>
+  <h2 class="section-title">New poems. Monthly letters. No noise.</h2>
+  <p class="section-sub">Join a quiet corner of the internet where poetry arrives in your inbox like a letter from a friend.</p>
+  <form class="newsletter-form" id="newsletter-form">
+    <input type="email" id="newsletter-email" placeholder="your@email.com" required>
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="fade-up">
+    <p class="section-label">&#10022; Reach Out</p>
+    <h2 class="section-title">Let's Connect</h2>
+    <p class="section-sub">For collaborations, features, speaking invitations, or just to say a poem moved you.</p>
+    <div class="contact-details">
+      <div class="contact-item"><div class="contact-icon">&#9993;</div><p>mutashi2@gmail.com</p></div>
+      <div class="contact-item"><div class="contact-icon">&#128205;</div><p>Nairobi, Kenya</p></div>
+    </div>
+    <div class="socials">
+      <a class="social-link" href="#" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.5 21v-8.2h2.7l.4-3h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.2v2.1H7.5v3h2.7V21h3.3Z"/>
+        </svg>
+      </a>
+      <a class="social-link" href="#" aria-label="Twitter">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18.9 2H22l-6.77 7.74L23 22h-6.1l-4.78-6.28L6.63 22H3.5l7.25-8.29L1 2h6.25l4.32 5.7L18.9 2Zm-1.07 18h1.69L6.33 3.9H4.5L17.83 20Z"/>
+        </svg>
+      </a>
+      <a class="social-link" href="#" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm11.5 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  <div class="contact-form-side fade-up">
+    <div class="form-group"><label>Your Name</label><input type="text" placeholder="Name"></div>
+    <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com"></div>
+    <div class="form-group"><label>Subject</label><input type="text" placeholder="Collaboration / Speaking / Just Hello"></div>
+    <div class="form-group"><label>Message</label><textarea placeholder="Write to me..."></textarea></div>
+    <button class="form-submit">Send Message</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  &copy;  mutashi2@gmail.com ;2026 <span>MutashiWrites</span> - All poems are mine. All rights reserved.
+</footer>
+
+<script>
+  const STORAGE_KEY = 'MutashiWrites_author_posts_v1';
+  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && window.location.port !== '3000'
+    ? 'http://localhost:3000'
+    : '';
+  const POSTS_API_URL = `${API_BASE_URL}/api/posts`;
+
+  const poemsGrid = document.querySelector('.poems-grid');
+  const navElement = document.querySelector('nav');
+  const navToggle = document.querySelector('.nav-toggle');
+  const navLinksContainer = document.querySelector('.nav-links');
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const authorForm = document.getElementById('author-form');
+  const clearPostsBtn = document.getElementById('clear-posts');
+  const authorStatus = document.getElementById('author-status');
+  const newsletterForm = document.getElementById('newsletter-form');
+  const newsletterEmail = document.getElementById('newsletter-email');
+  const refreshSubscribersBtn = document.getElementById('refresh-subscribers');
+  const subscriberCountEl = document.getElementById('subscriber-count');
+  const subscriberListEl = document.getElementById('subscriber-list');
+  const subscriberStatusEl = document.getElementById('subscriber-status');
+  const backendMode = document.getElementById('backend-mode');
+  let apiHealthy = false;
+
+  const toSafeText = (value) => String(value ?? '');
+  const escapeHtml = (value) => toSafeText(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+  const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+  const formatDate = (isoDate) => new Date(isoDate).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const localLoadPosts = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  };
+
+  const localSavePosts = (posts) => localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+
+  const setBackendMode = (mode) => {
+    backendMode.textContent = mode;
+  };
+
+  const formatDateTime = (isoDate) => {
+    try {
+      return new Date(isoDate).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return '';
+    }
+  };
+
+  const setSubscriberStatus = (message) => {
+    subscriberStatusEl.textContent = message;
+    setTimeout(() => {
+      if (subscriberStatusEl.textContent === message) subscriberStatusEl.textContent = '';
+    }, 2800);
+  };
+
+  const renderSubscribers = (payload) => {
+    const subscribers = Array.isArray(payload?.subscribers) ? payload.subscribers : [];
+    subscriberCountEl.textContent = String(payload?.count ?? subscribers.length ?? 0);
+    subscriberListEl.innerHTML = '';
+    if (!subscribers.length) {
+      const li = document.createElement('li');
+      li.textContent = 'No subscribers yet.';
+      subscriberListEl.appendChild(li);
+      return;
+    }
+
+    subscribers.forEach((subscriber) => {
+      const li = document.createElement('li');
+      const email = document.createElement('span');
+      email.textContent = subscriber.email;
+      const date = document.createElement('span');
+      date.textContent = formatDateTime(subscriber.subscribedAt);
+      li.appendChild(email);
+      li.appendChild(date);
+      subscriberListEl.appendChild(li);
+    });
+  };
+
+  const fetchSubscribers = async () => {
+    const response = await fetch(`${API_BASE_URL}/api/subscribers`, { method: 'GET' });
+    if (!response.ok) throw new Error('Unable to load subscribers.');
+    return response.json();
+  };
+
+  const createSubscriber = async (email) => {
+    const response = await fetch(`${API_BASE_URL}/api/subscribers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!response.ok) {
+      let message = 'Subscription failed.';
+      try {
+        const body = await response.json();
+        if (body?.error) message = body.error;
+      } catch {
+        // keep default message
+      }
+      throw new Error(message);
+    }
+    return response.json();
+  };
+
+  const refreshSubscribers = async () => {
+    try {
+      const data = await fetchSubscribers();
+      renderSubscribers(data);
+      setSubscriberStatus('Subscribers updated.');
+    } catch (error) {
+      setSubscriberStatus(error.message || 'Could not load subscribers.');
+    }
+  };
+
+  const toCardModel = (post = {}) => ({
+    id: post.id,
+    title: post.title,
+    theme: post.theme,
+    excerpt: post.excerpt || '',
+    readTime: post.readTime || '2 min read',
+    createdAt: post.createdAt || new Date().toISOString()
+  });
+
+  const fetchRemotePosts = async () => {
+    const response = await fetch(POSTS_API_URL, { method: 'GET' });
+    if (!response.ok) throw new Error('API unavailable');
+    const posts = await response.json();
+    if (!Array.isArray(posts)) throw new Error('Invalid API response');
+    apiHealthy = true;
+    setBackendMode('Online (Node API)');
+    return posts.map(toCardModel);
+  };
+
+  const saveRemotePost = async (post) => {
+    const response = await fetch(POSTS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(post)
+    });
+    if (!response.ok) throw new Error('API publish failed');
+    apiHealthy = true;
+    setBackendMode('Online (Node API)');
+  };
+
+  const clearRemotePosts = async () => {
+    const response = await fetch(POSTS_API_URL, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('API clear failed');
+    apiHealthy = true;
+    setBackendMode('Online (Node API)');
+  };
+
+  const loadPosts = async () => {
+    try {
+      return await fetchRemotePosts();
+    } catch {
+      apiHealthy = false;
+      setBackendMode('Local only (API offline)');
+      return localLoadPosts();
+    }
+  };
+
+  const createPost = async (post) => {
+    try {
+      await saveRemotePost(post);
+      return;
+    } catch {
+      apiHealthy = false;
+      const posts = localLoadPosts();
+      posts.unshift(post);
+      localSavePosts(posts);
+      setBackendMode('Local only (API offline)');
+    }
+  };
+
+  const clearPosts = async () => {
+    try {
+      await clearRemotePosts();
+      return;
+    } catch {
+      apiHealthy = false;
+      localStorage.removeItem(STORAGE_KEY);
+      setBackendMode('Local only (API offline)');
+    }
+  };
+
+  const buildUserPostCard = (post) => {
+    const card = document.createElement('a');
+    card.className = 'poem-card user-post';
+    card.href = '#';
+    card.dataset.userPost = 'true';
+    card.dataset.category = post.theme.toLowerCase();
+    card.innerHTML = `
+      <p class="poem-card-tag">${escapeHtml(post.theme)}</p>
+      <h3 class="poem-card-title">${escapeHtml(post.title)}</h3>
+      <p class="poem-card-excerpt">${escapeHtml(post.excerpt)}</p>
+      <div class="poem-card-meta">
+        <span>${escapeHtml(formatDate(post.createdAt))}</span>
+        <span>${escapeHtml(post.readTime)}</span>
+      </div>
+    `;
+    return card;
+  };
+
+  const syncCardCategories = () => {
+    document.querySelectorAll('.poem-card').forEach((card) => {
+      if (!card.dataset.category) {
+        const tag = card.querySelector('.poem-card-tag');
+        card.dataset.category = tag ? tag.textContent.trim().toLowerCase() : 'all';
+      }
+    });
+  };
+
+  const renderSavedPosts = async () => {
+    document.querySelectorAll('.poem-card[data-user-post="true"]').forEach((node) => node.remove());
+    const posts = await loadPosts();
+    const fragment = document.createDocumentFragment();
+    posts.forEach((post) => fragment.appendChild(buildUserPostCard(post)));
+    poemsGrid.prepend(fragment);
+    syncCardCategories();
+    applyFilter();
+  };
+
+  const setStatus = (message) => {
+    authorStatus.textContent = message;
+    setTimeout(() => {
+      if (authorStatus.textContent === message) authorStatus.textContent = '';
+    }, 2500);
+  };
+
+  const activeFilter = () => {
+    const active = document.querySelector('.filter-btn.active');
+    return active ? active.textContent.trim().toLowerCase() : 'all';
+  };
+
+  const applyFilter = () => {
+    const current = activeFilter();
+    document.querySelectorAll('.poem-card').forEach((card) => {
+      const category = (card.dataset.category || '').toLowerCase();
+      card.style.display = (current === 'all' || category === current) ? '' : 'none';
+    });
+  };
+
+  const closeMobileNav = () => {
+    navElement.classList.remove('nav-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  };
+
+  navToggle.addEventListener('click', () => {
+    const nextOpen = !navElement.classList.contains('nav-open');
+    navElement.classList.toggle('nav-open', nextOpen);
+    navToggle.setAttribute('aria-expanded', String(nextOpen));
+  });
+
+  navLinksContainer.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!navElement.contains(event.target)) closeMobileNav();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 640) closeMobileNav();
+  });
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter();
+    });
+  });
+
+  authorForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const title = document.getElementById('author-title').value.trim();
+    const theme = document.getElementById('author-theme').value.trim();
+    const excerpt = document.getElementById('author-excerpt').value.trim();
+    const readTime = document.getElementById('author-read-time').value.trim() || '2 min read';
+
+    if (!title || !theme || !excerpt) {
+      setStatus('Please fill in title, theme, and excerpt.');
+      return;
+    }
+
+    try {
+      await createPost({
+        id: generatePostId(),
+        title,
+        theme,
+        excerpt,
+        readTime,
+        createdAt: new Date().toISOString()
+      });
+      authorForm.reset();
+      document.getElementById('author-read-time').value = '2 min read';
+      await renderSavedPosts();
+      setStatus('Published.');
+    } catch (error) {
+      setStatus(error.message || 'Publish failed.');
+    }
+  });
+
+  clearPostsBtn.addEventListener('click', async () => {
+    try {
+      await clearPosts();
+      await renderSavedPosts();
+      setStatus('Saved posts cleared.');
+    } catch (error) {
+      setStatus(error.message || 'Clear failed.');
+    }
+  });
+
+  refreshSubscribersBtn.addEventListener('click', async () => {
+    await refreshSubscribers();
+  });
+
+  newsletterForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = newsletterEmail.value.trim().toLowerCase();
+    if (!email) return;
+
+    try {
+      const data = await createSubscriber(email);
+      renderSubscribers(data);
+      newsletterForm.reset();
+      setSubscriberStatus(data.created ? 'Subscriber added.' : 'Subscriber already exists.');
+    } catch (error) {
+      setSubscriberStatus(error.message || 'Subscription failed.');
+    }
+  });
+
+  syncCardCategories();
+  setBackendMode('Checking Node API...');
+  renderSavedPosts();
+  refreshSubscribers();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
