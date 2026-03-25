@@ -65,14 +65,16 @@
     color: var(--ink);
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    gap: 4px;
     cursor: pointer;
     border-radius: 999px;
   }
   .nav-toggle .bar {
-    width: 18px;
+    width: 19px;
     height: 2px;
     background: currentColor;
-    margin: 3px 0;
+    margin: 0;
     display: block;
     transition: transform .22s ease, opacity .2s ease;
     transform-origin: center;
@@ -546,53 +548,149 @@
     letter-spacing: .15em;
     text-transform: uppercase;
     color: #5a4d41;
-    /* CATEGORIES */
-#categories { background: var(--ink); color: var(--paper); }
-#categories .section-title { color: var(--paper); }
-#categories .section-sub { color: rgba(250,247,242,.8); }
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-.category-card {
-  border: 1px solid rgba(250,247,242,.22);
-  padding: 3rem 2rem;
-  transition: all .3s;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  text-decoration: none;
-  display: block;
-}
-.category-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .35s;
-}
-.category-card:hover::before { transform: scaleX(1); }
-.category-card:hover { border-color: rgba(250,247,242,.4); }
-.category-icon {
-  font-size: 2rem;
-  margin-bottom: 1.2rem;
-  display: block;
-}
-.category-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.8rem;
-  font-style: italic;
-  margin-bottom: .6rem;
-  color: var(--paper);
-}
-.category-desc {
-  font-size: .78rem;
-  letter-spacing: .1em;
-  color: rgba(250,247,242,.65);
+    margin-bottom: 1rem;
+  }
+  .poem-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding-top: .9rem;
+    border-top: 1px solid rgba(190, 163, 124, 0.45);
+  }
+  .poem-card-action-row {
+    display: flex;
+    gap: .55rem;
+    flex-wrap: wrap;
+  }
+  .poem-action {
+    border: 1px solid rgba(190, 163, 124, 0.7);
+    background: rgba(251, 244, 235, 0.78);
+    color: #463a31;
+    padding: .48rem .7rem;
+    font: inherit;
+    font-size: .62rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .poem-action.is-active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .poem-action-status {
+    font-size: .62rem;
+    letter-spacing: .08em;
+    color: #6b5645;
+    min-height: 1em;
+  }
+  .poem-card-comments {
+    display: none;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(190, 163, 124, 0.7);
+  }
+  .poem-card-comments.is-open {
+    display: block;
+  }
+  .poem-comment-list {
+    list-style: none;
+    display: grid;
+    gap: .7rem;
+    margin-bottom: .8rem;
+  }
+  .poem-comment-list li {
+    background: rgba(251, 244, 235, 0.82);
+    border: 1px solid rgba(190, 163, 124, 0.35);
+    padding: .75rem .8rem;
+    font-size: .8rem;
+    line-height: 1.6;
+    color: #43382f;
+  }
+  .poem-comment-empty {
+    font-size: .75rem;
+    color: #6d6054;
+  }
+  .poem-comment-form {
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+  }
+  .poem-comment-input {
+    flex: 1;
+    min-height: 44px;
+    border: 1px solid #bea37c;
+    background: #fbf4eb;
+    padding: .7rem .8rem;
+    font: inherit;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .poem-comment-submit {
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    padding: .72rem .95rem;
+    font: inherit;
+    font-size: .62rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .poem-comment-submit:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  /* CATEGORIES */
+  #categories { background: var(--ink); color: var(--paper); }
+  #categories .section-title { color: var(--paper); }
+  #categories .section-sub { color: rgba(250,247,242,.8); }
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .category-card {
+    border: 1px solid rgba(250,247,242,.22);
+    padding: 3rem 2rem;
+    transition: all .3s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+  }
+  .category-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .35s;
+  }
+  .category-card:hover::before { transform: scaleX(1); }
+  .category-card:hover { border-color: rgba(250,247,242,.4); }
+  .category-icon {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+  .category-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-style: italic;
+    margin-bottom: .6rem;
+    color: var(--paper);
+  }
+  .category-desc {
+    font-size: .78rem;
+    letter-spacing: .1em;
+    color: rgba(250,247,242,.65);
+  }
   line-height: 1.7;
 }
 @media (max-width: 720px) {
@@ -1021,6 +1119,11 @@
     .spoken-card,
     .collection-card {
       padding: 1.4rem;
+    }
+    .poem-card-actions,
+    .poem-comment-form {
+      flex-direction: column;
+      align-items: stretch;
     }
     .poem-card-title {
       font-size: 1.3rem;
@@ -1546,6 +1649,7 @@ Tryna navigate the real and fake</p>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
   const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
 
   const formatDate = (isoDate) => new Date(isoDate).toLocaleDateString('en-US', {
     month: 'short',
@@ -1685,13 +1789,117 @@ Tryna navigate the real and fake</p>
     await clearRemotePosts();
   };
 
+  const toEntryId = (card, fallbackTitle = '') => {
+    if (card?.dataset?.entryId) return card.dataset.entryId;
+    const source = fallbackTitle || card?.querySelector('.poem-card-title')?.textContent || 'entry';
+    return source.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'entry';
+  };
+
+  const loadReaderInteractions = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(READER_INTERACTIONS_KEY) || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const saveReaderInteractions = (state) => {
+    localStorage.setItem(READER_INTERACTIONS_KEY, JSON.stringify(state));
+  };
+
+  const getEntryState = (entryId) => {
+    const all = loadReaderInteractions();
+    return all[entryId] || { liked: false, likes: 0, comments: [] };
+  };
+
+  const updateEntryState = (entryId, updater) => {
+    const all = loadReaderInteractions();
+    const current = all[entryId] || { liked: false, likes: 0, comments: [] };
+    all[entryId] = updater(current);
+    saveReaderInteractions(all);
+    return all[entryId];
+  };
+
+  const buildReaderTools = (card, entryId) => {
+    const tools = document.createElement('div');
+    tools.className = 'poem-reader-tools';
+    tools.innerHTML = `
+      <div class="poem-card-actions">
+        <div class="poem-card-action-row">
+          <button class="poem-action" type="button" data-reader-action="like">Like <span data-like-count>0</span></button>
+          <button class="poem-action" type="button" data-reader-action="share">Share</button>
+          <button class="poem-action" type="button" data-reader-action="comment-toggle">Comment <span data-comment-count>0</span></button>
+        </div>
+        <p class="poem-action-status" data-share-status></p>
+      </div>
+      <div class="poem-card-comments" data-comments-panel>
+        <ul class="poem-comment-list" data-comment-list></ul>
+        <p class="poem-comment-empty" data-comment-empty>No comments yet. Be the first reader to respond.</p>
+        <form class="poem-comment-form" data-comment-form>
+          <textarea class="poem-comment-input" data-comment-input placeholder="Leave a comment..." rows="2"></textarea>
+          <button class="poem-comment-submit" type="submit">Post</button>
+        </form>
+      </div>
+    `;
+    tools.dataset.entryId = entryId;
+    return tools;
+  };
+
+  const renderReaderTools = (card) => {
+    const entryId = toEntryId(card);
+    card.dataset.entryId = entryId;
+    let tools = card.querySelector('.poem-reader-tools');
+    if (!tools) {
+      tools = buildReaderTools(card, entryId);
+      card.appendChild(tools);
+    }
+    const state = getEntryState(entryId);
+    const likeButton = tools.querySelector('[data-reader-action="like"]');
+    const likeCount = tools.querySelector('[data-like-count]');
+    const commentCount = tools.querySelector('[data-comment-count]');
+    const commentPanel = tools.querySelector('[data-comments-panel]');
+    const commentList = tools.querySelector('[data-comment-list]');
+    const commentEmpty = tools.querySelector('[data-comment-empty]');
+
+    likeButton.classList.toggle('is-active', !!state.liked);
+    likeCount.textContent = String(state.likes || 0);
+    commentCount.textContent = String((state.comments || []).length);
+    commentList.innerHTML = '';
+
+    if (!state.comments?.length) {
+      commentEmpty.style.display = '';
+    } else {
+      commentEmpty.style.display = 'none';
+      state.comments.forEach((comment) => {
+        const item = document.createElement('li');
+        item.textContent = comment;
+        commentList.appendChild(item);
+      });
+    }
+
+    if (!commentPanel.classList.contains('is-open') && state.comments?.length) {
+      commentPanel.classList.add('is-open');
+    }
+  };
+
+  const enhanceReaderCards = () => {
+    document.querySelectorAll('.poem-card').forEach((card, index) => {
+      if (!card.dataset.entryId) {
+        const title = card.querySelector('.poem-card-title')?.textContent?.trim() || `entry-${index + 1}`;
+        card.dataset.entryId = toEntryId(card, title);
+      }
+      renderReaderTools(card);
+    });
+  };
+
   const buildUserPostCard = (post) => {
-    const card = document.createElement('a');
+    const card = document.createElement('article');
     card.className = 'poem-card user-post';
-    card.href = '#';
     card.dataset.userPost = 'true';
     card.dataset.category = post.theme.toLowerCase();
     card.dataset.format = (post.format || 'poem').toLowerCase();
+    card.dataset.entryId = post.id;
     card.innerHTML = `
       <p class="poem-card-tag">${escapeHtml(`${(post.format || 'poem').replace(/^./, (c) => c.toUpperCase())} | ${post.theme}`)}</p>
       <h3 class="poem-card-title">${escapeHtml(post.title)}</h3>
@@ -1723,6 +1931,7 @@ Tryna navigate the real and fake</p>
     posts.forEach((post) => fragment.appendChild(buildUserPostCard(post)));
     poemsGrid.prepend(fragment);
     syncCardCategories();
+    enhanceReaderCards();
     applyFilter();
   };
 
@@ -1881,6 +2090,85 @@ Tryna navigate the real and fake</p>
     authorReadTime.dataset.autoDefault = 'false';
   });
 
+  poemsGrid.addEventListener('click', async (event) => {
+    const actionButton = event.target.closest('[data-reader-action]');
+    if (!actionButton) return;
+
+    event.preventDefault();
+    const card = actionButton.closest('.poem-card');
+    if (!card) return;
+
+    const entryId = toEntryId(card);
+    const status = card.querySelector('[data-share-status]');
+
+    if (actionButton.dataset.readerAction === 'like') {
+      updateEntryState(entryId, (current) => {
+        const liked = !current.liked;
+        return {
+          ...current,
+          liked,
+          likes: Math.max(0, (current.likes || 0) + (liked ? 1 : -1))
+        };
+      });
+      renderReaderTools(card);
+      return;
+    }
+
+    if (actionButton.dataset.readerAction === 'comment-toggle') {
+      const panel = card.querySelector('[data-comments-panel]');
+      panel.classList.toggle('is-open');
+      if (panel.classList.contains('is-open')) {
+        card.querySelector('[data-comment-input]')?.focus();
+      }
+      return;
+    }
+
+    if (actionButton.dataset.readerAction === 'share') {
+      const title = card.querySelector('.poem-card-title')?.textContent?.trim() || 'Mutashi Writes';
+      const shareUrl = `${window.location.origin}${window.location.pathname}#poems`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title, text: `Read "${title}" on Mutashi Writes.`, url: shareUrl });
+        } else if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(`${title} - ${shareUrl}`);
+        }
+        if (status) {
+          status.textContent = 'Shared.';
+          setTimeout(() => {
+            if (status.textContent === 'Shared.') status.textContent = '';
+          }, 1800);
+        }
+      } catch {
+        if (status) {
+          status.textContent = 'Share cancelled.';
+          setTimeout(() => {
+            if (status.textContent === 'Share cancelled.') status.textContent = '';
+          }, 1800);
+        }
+      }
+    }
+  });
+
+  poemsGrid.addEventListener('submit', (event) => {
+    const form = event.target.closest('[data-comment-form]');
+    if (!form) return;
+
+    event.preventDefault();
+    const card = form.closest('.poem-card');
+    const input = form.querySelector('[data-comment-input]');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const entryId = toEntryId(card);
+    updateEntryState(entryId, (current) => ({
+      ...current,
+      comments: [...(current.comments || []), text]
+    }));
+    input.value = '';
+    renderReaderTools(card);
+    card.querySelector('[data-comments-panel]')?.classList.add('is-open');
+  });
+
   authorForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const format = authorFormat.value.trim();
@@ -1945,6 +2233,7 @@ Tryna navigate the real and fake</p>
   });
 
   syncCardCategories();
+  enhanceReaderCards();
   authorReadTime.dataset.autoDefault = 'true';
   updateAuthorForm();
   if (window.location.hash === '#author-studio') revealAuthorStudio();
