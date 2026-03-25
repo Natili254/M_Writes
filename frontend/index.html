@@ -61,20 +61,22 @@
     width: 42px;
     height: 42px;
     border: 1px solid rgba(184,154,106,0.35);
-    background: transparent;
+    background: rgba(239,227,210,0.78);
     color: var(--ink);
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border-radius: 999px;
   }
   .nav-toggle .bar {
     width: 18px;
-    height: 1px;
+    height: 2px;
     background: currentColor;
     margin: 3px 0;
     display: block;
     transition: transform .22s ease, opacity .2s ease;
     transform-origin: center;
+    border-radius: 999px;
   }
   nav.nav-open .nav-toggle .bar:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
@@ -86,6 +88,59 @@
     transform: translateY(-7px) rotate(-45deg);
   }
   .nav-links { display: flex; gap: 2.8rem; list-style: none; }
+  .nav-item {
+    position: relative;
+  }
+  .nav-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+  }
+  .nav-dropdown-toggle .caret {
+    font-size: .58rem;
+    transition: transform .25s ease;
+  }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 1rem);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 220px;
+    padding: .55rem;
+    list-style: none;
+    background: rgba(244, 234, 220, 0.96);
+    border: 1px solid rgba(184,154,106,0.22);
+    box-shadow: 0 18px 40px rgba(16, 12, 9, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+  }
+  .nav-item:hover .nav-dropdown,
+  .nav-item:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  .nav-item:hover .nav-dropdown-toggle .caret,
+  .nav-item:focus-within .nav-dropdown-toggle .caret {
+    transform: rotate(180deg);
+  }
+  .nav-dropdown li + li {
+    margin-top: .2rem;
+  }
+  .nav-dropdown a {
+    display: block;
+    padding: .75rem .85rem;
+    border-radius: .8rem;
+    font-size: .64rem;
+    letter-spacing: .18em;
+    background: transparent;
+  }
+  .nav-dropdown a:hover {
+    background: rgba(159, 124, 70, 0.1);
+  }
   .nav-links a {
     font-size: .72rem;
     letter-spacing: .22em;
@@ -117,6 +172,28 @@
     transition: background .25s;
   }
   .nav-cta:hover { background: var(--gold); }
+  .writer-entry {
+    position: fixed;
+    top: 5.8rem;
+    right: 1.2rem;
+    z-index: 99;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .78rem 1.12rem;
+    border: 1px solid rgba(209,184,127,0.42);
+    background: rgba(22, 16, 13, 0.92);
+    color: var(--paper);
+    text-decoration: none;
+    font-size: .63rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 16px 36px rgba(15, 11, 8, 0.26);
+  }
+  .writer-entry:hover {
+    background: rgba(159, 124, 70, 0.96);
+  }
 
   /* HERO */
   #home {
@@ -129,7 +206,7 @@
     background:
       linear-gradient(90deg, rgba(20, 16, 12, 0.84) 0%, rgba(20, 16, 12, 0.62) 45%, rgba(20, 16, 12, 0.3) 100%),
       linear-gradient(180deg, rgba(8, 6, 4, 0.18) 0%, rgba(8, 6, 4, 0.5) 100%),
-      url('backg.jpeg') center/cover no-repeat;
+      url('backg.jpeg') center 18%/contain no-repeat;
     color: var(--paper);
   }
   #home::before {
@@ -210,11 +287,11 @@
     position: relative;
     width: min(420px, 100%);
     padding: 1.35rem 1.4rem 1.5rem;
-    background: linear-gradient(180deg, rgba(17, 13, 10, 0.16) 0%, rgba(17, 13, 10, 0.34) 100%);
-    backdrop-filter: blur(10px) saturate(115%);
-    -webkit-backdrop-filter: blur(10px) saturate(115%);
-    box-shadow: 0 16px 48px rgba(10, 8, 6, .18);
-    border: 1px solid rgba(250, 247, 242, 0.18);
+    background: linear-gradient(180deg, rgba(17, 13, 10, 0.08) 0%, rgba(17, 13, 10, 0.22) 100%);
+    backdrop-filter: blur(8px) saturate(110%);
+    -webkit-backdrop-filter: blur(8px) saturate(110%);
+    box-shadow: 0 14px 36px rgba(10, 8, 6, .14);
+    border: 1px solid rgba(250, 247, 242, 0.14);
   }
   .poem-label {
     font-size: .6rem;
@@ -235,11 +312,11 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 1rem;
     line-height: 1.8;
-    color: rgba(250,247,242,.92);
-    border-left: 2px solid rgba(209, 184, 127, 0.5);
+    color: rgba(250,247,242,.96);
+    border-left: 2px solid rgba(209, 184, 127, 0.42);
     padding-left: 1rem;
     font-style: italic;
-    text-shadow: 0 1px 10px rgba(10, 8, 6, 0.32);
+    text-shadow: 0 1px 12px rgba(10, 8, 6, 0.38);
   }
   .poem-read-more {
     display: inline-block;
@@ -286,6 +363,7 @@
 
   /* POEMS */
   #poems { background: linear-gradient(180deg, #e8dcc7 0%, #e2d2b9 100%); }
+  .format-filter { margin-bottom: 1.2rem; }
   .filter-bar { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 3rem; }
   .filter-btn {
     font-size: .65rem;
@@ -304,6 +382,9 @@
     color: var(--paper);
     border-color: var(--ink);
   }
+  .format-btn {
+    background: rgba(250, 247, 242, 0.55);
+  }
   .poems-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -314,6 +395,9 @@
     border: 1px solid #cbb48f;
     padding: 1.6rem;
     margin-bottom: 2rem;
+  }
+  .author-studio.is-hidden {
+    display: none;
   }
   .author-studio h3 {
     font-family: 'Cormorant Garamond', serif;
@@ -326,6 +410,16 @@
     font-size: .85rem;
     margin-bottom: 1rem;
     line-height: 1.6;
+  }
+  .author-type-note {
+    display: inline-flex;
+    gap: .5rem;
+    align-items: center;
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #6b5645;
+    margin-bottom: 1rem;
   }
   .author-form {
     display: grid;
@@ -452,59 +546,59 @@
     letter-spacing: .15em;
     text-transform: uppercase;
     color: #5a4d41;
+    /* CATEGORIES */
+#categories { background: var(--ink); color: var(--paper); }
+#categories .section-title { color: var(--paper); }
+#categories .section-sub { color: rgba(250,247,242,.8); }
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.category-card {
+  border: 1px solid rgba(250,247,242,.22);
+  padding: 3rem 2rem;
+  transition: all .3s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .35s;
+}
+.category-card:hover::before { transform: scaleX(1); }
+.category-card:hover { border-color: rgba(250,247,242,.4); }
+.category-icon {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+  display: block;
+}
+.category-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-style: italic;
+  margin-bottom: .6rem;
+  color: var(--paper);
+}
+.category-desc {
+  font-size: .78rem;
+  letter-spacing: .1em;
+  color: rgba(250,247,242,.65);
+  line-height: 1.7;
+}
+@media (max-width: 720px) {
+  .categories-grid { grid-template-columns: 1fr; }
+}
   }
-
-  /* COLLECTIONS */
-  #collections { background: var(--ink); color: var(--paper); }
-  #collections .section-title { color: var(--paper); }
-  #collections .section-sub { color: rgba(250,247,242,.8); }
-  .collections-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-  }
-  .collection-card {
-    border: 1px solid rgba(250,247,242,.22);
-    padding: 2.5rem 1.8rem;
-    transition: all .3s;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .collection-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--gold);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform .35s;
-  }
-  .collection-card:hover::before { transform: scaleX(1); }
-  .collection-card:hover { border-color: rgba(250,247,242,.25); }
-  .coll-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 3.5rem;
-    font-weight: 300;
-    color: rgba(184,154,106,.38);
-    margin-bottom: 1rem;
-    line-height: 1;
-  }
-  .coll-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    font-style: italic;
-    margin-bottom: .6rem;
-    color: var(--paper);
-  }
-  .coll-count {
-    font-size: .6rem;
-    letter-spacing: .25em;
-    text-transform: uppercase;
-    color: rgba(250,247,242,.7);
-  }
-
   /* ABOUT */
   #about {
     background: linear-gradient(180deg, #efe3d2 0%, #e7d7c0 100%);
@@ -801,10 +895,24 @@
       justify-content: center;
       flex-wrap: wrap;
     }
+    .writer-entry {
+      top: 5.3rem;
+      right: 1rem;
+    }
+    .nav-dropdown {
+      left: 0;
+      transform: none;
+    }
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+      transform: translateY(-4px);
+    }
     #home {
       grid-template-columns: 1fr;
       min-height: auto;
       padding-top: 130px;
+      background-position: center top;
+      background-size: cover, cover, 100% auto;
     }
     .hero-left {
       padding: 3.5rem 1.5rem 2rem;
@@ -976,6 +1084,15 @@
       position: relative;
       z-index: 102;
     }
+    .writer-entry {
+      top: auto;
+      bottom: 1rem;
+      right: 1rem;
+      font-size: .58rem;
+      letter-spacing: .14em;
+      padding: .68rem .9rem;
+      z-index: 99;
+    }
     .nav-cta {
       display: none;
     }
@@ -983,8 +1100,8 @@
       position: fixed;
       inset: 0;
       display: block;
-      background: rgba(15, 11, 8, 0.42);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 11, 8, 0.34);
+      backdrop-filter: blur(6px);
       opacity: 0;
       pointer-events: none;
       transition: opacity .25s ease;
@@ -1002,14 +1119,64 @@
       align-items: stretch;
       gap: 0;
       justify-content: center;
-      padding: 5.5rem 1.1rem 1.2rem;
-      background: linear-gradient(180deg, rgba(239,227,210,0.98) 0%, rgba(228,212,191,0.98) 100%);
+      padding: 5.8rem 1.1rem 1.4rem;
+      background:
+        radial-gradient(circle at top right, rgba(159, 124, 70, 0.16), transparent 32%),
+        linear-gradient(180deg, rgba(239,227,210,0.99) 0%, rgba(228,212,191,0.98) 100%);
       border-left: 1px solid rgba(184,154,106,0.2);
       margin-top: 0;
       box-shadow: -20px 0 50px rgba(10, 8, 6, 0.18);
       transform: translateX(100%);
       transition: transform .28s ease;
       z-index: 101;
+      isolation: isolate;
+    }
+    .nav-item {
+      position: static;
+    }
+    .nav-dropdown {
+      position: static;
+      min-width: 0;
+      margin-top: .35rem;
+      padding: .3rem 0 0 .65rem;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+    }
+    .nav-dropdown li + li {
+      margin-top: 0;
+    }
+    .nav-dropdown a {
+      padding: .6rem .9rem;
+      font-size: .6rem;
+      color: #6a5748;
+    }
+    .nav-dropdown-toggle {
+      justify-content: space-between;
+      width: 100%;
+    }
+    .nav-links::before {
+      content: 'Menu';
+      position: absolute;
+      top: 1.35rem;
+      left: 1.1rem;
+      font-size: .64rem;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: rgba(83, 70, 58, 0.72);
+    }
+    .nav-links::after {
+      content: '';
+      position: absolute;
+      top: 2.6rem;
+      left: 1.1rem;
+      width: 44px;
+      height: 1px;
+      background: rgba(159, 124, 70, 0.4);
     }
     nav.nav-open .nav-links {
       transform: translateX(0);
@@ -1026,12 +1193,20 @@
       padding: .85rem .9rem;
       font-size: .68rem;
       letter-spacing: .16em;
+      border-radius: .85rem;
+      transition: background .25s ease, color .25s ease, transform .25s ease;
     }
     .nav-links a::after {
       display: none;
     }
+    .nav-links a:hover {
+      background: rgba(159, 124, 70, 0.1);
+      transform: translateX(4px);
+    }
     #home {
       padding-top: 95px;
+      background-position: center top;
+      background-size: cover, cover, auto 100%;
     }
     .hero-right {
       min-height: 44vh;
@@ -1054,6 +1229,8 @@
 </head>
 <body>
 
+<a class="writer-entry" href="#author-studio" id="writer-entry">Write a poem</a>
+
 <!-- NAVIGATION -->
 <nav>
   <a class="nav-logo" href="#home">Mutashi<tspan>Writes</span></a>
@@ -1065,7 +1242,15 @@
   <div class="nav-scrim" aria-hidden="true"></div>
   <ul class="nav-links">
     <li><a href="#poems">Poems</a></li>
-    <li><a href="#collections">Collections</a></li>
+    <li class="nav-item">
+      <a class="nav-dropdown-toggle" href="#poems">Explore <span class="caret">▾</span></a>
+      <ul class="nav-dropdown">
+        <li><a href="#poems" data-nav-format="all">All</a></li>
+        <li><a href="#poems" data-nav-format="poem">Poems</a></li>
+        <li><a href="#poems" data-nav-format="article">Articles</a></li>
+        <li><a href="#poems" data-nav-format="voice">Voice</a></li>
+      </ul>
+    </li>
     <li><a href="#about">About</a></li>
     <li><a href="#events">Events</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -1111,14 +1296,27 @@
 <section id="poems">
   <div class="fade-up">
     <p class="section-label">&#10022; The Library</p>
-    <h2 class="section-title">All Poems</h2>
-    <p class="section-sub">Every word a door. Browse by theme, or let yourself wander.</p>
+    <h2 class="section-title">Explore The Writing</h2>
+    <p class="section-sub">Choose whether you want to read a poem, an article, or a voice piece, then wander by theme.</p>
   </div>
 
-  <div class="author-studio fade-up">
+  <div class="filter-bar format-filter fade-up">
+    <button class="filter-btn format-btn active" data-format="all">All</button>
+    <button class="filter-btn format-btn" data-format="poem">Poems</button>
+    <button class="filter-btn format-btn" data-format="article">Articles</button>
+    <button class="filter-btn format-btn" data-format="voice">Voice</button>
+  </div>
+
+  <div class="author-studio fade-up is-hidden" id="author-studio">
     <h3>Author Studio</h3>
     <p>Write and publish directly from this page. Shared mode: <strong id="backend-mode">Local only</strong>.</p>
+    <div class="author-type-note" id="author-type-note">Now writing: Poem</div>
     <form class="author-form" id="author-form">
+      <select id="author-format" required>
+        <option value="poem">Poem</option>
+        <option value="article">Article</option>
+        <option value="voice">Voice</option>
+      </select>
       <input type="text" id="author-title" placeholder="Poem title" required>
       <select id="author-theme" required>
         <option value="">Select theme</option>
@@ -1133,7 +1331,7 @@
       <textarea class="full" id="author-excerpt" placeholder="Write a short excerpt..." required></textarea>
       <input type="text" id="author-read-time" placeholder="Read time (e.g. 2 min read)" value="2 min read" required>
       <div class="author-form-actions full">
-        <button class="btn-primary" type="submit">Publish</button>
+        <button class="btn-primary" type="submit" id="publish-button">Publish Poem</button>
         <button class="btn-ghost" type="button" id="clear-posts">Clear Saved Posts</button>
         <span class="author-status" id="author-status"></span>
       </div>
@@ -1151,31 +1349,43 @@
   </div>
 
   <div class="filter-bar fade-up">
-    <button class="filter-btn active">All</button>
-    <button class="filter-btn">Love</button>
-    <button class="filter-btn">Healing</button>
-    <button class="filter-btn">Identity</button>
-    <button class="filter-btn">Spiritual</button>
-    <button class="filter-btn">Loss</button>
-    <button class="filter-btn">Growth</button>
+    <button class="filter-btn active" data-theme="all">All Themes</button>
+    <button class="filter-btn" data-theme="love">Love</button>
+    <button class="filter-btn" data-theme="healing">Healing</button>
+    <button class="filter-btn" data-theme="identity">Identity</button>
+    <button class="filter-btn" data-theme="spiritual">Spiritual</button>
+    <button class="filter-btn" data-theme="loss">Loss</button>
+    <button class="filter-btn" data-theme="growth">Growth</button>
   </div>
 
   <div class="poems-grid fade-up">
-    <a class="poem-card" href="#">
-      <p class="poem-card-tag">Healing</p>
+    <a class="poem-card" href="#" data-format="poem">
+      <p class="poem-card-tag">Poem &middot; Healing</p>
       <h3 class="poem-card-title">After the Storm, I Made Tea</h3>
       <p class="poem-card-excerpt">I didn't know healing looked like this - quiet, ordinary, steam rising from a cup while the world outside forgot to stop...</p>
       <div class="poem-card-meta"><span>Feb 14, 2025</span><span>2 min read</span></div>
     </a>
     
-    <a class="poem-card" href="#">
-      <p class="poem-card-tag">Identity</p>
+    <a class="poem-card" href="#" data-format="article">
+      <p class="poem-card-tag">Article &middot; Identity</p>
       <h3 class="poem-card-title">The Name I Chose for Myself</h3>
       <p class="poem-card-excerpt">not the name they pinned on me at birth - a different one, earned in the dark, the one that fits the shape of my becoming...</p>
-      <div class="poem-card-meta"><span>Jan 10, 2025</span><span>2 min read</span></div>
+      <div class="poem-card-meta"><span>Jan 10, 2025</span><span>6 min read</span></div>
     </a>
-    <a class="poem-card" href="#">
-      <p class="poem-card-tag">Love</p>
+    <a class="poem-card" href="#" data-format="article">
+      <p class="poem-card-tag">Article &middot; Love</p>
+      <h3 class="poem-card-title">When Love Stops Performing</h3>
+      <p class="poem-card-excerpt">A reflective essay on tenderness, boundaries, and the quiet difference between being admired and being truly known.</p>
+      <div class="poem-card-meta"><span>Mar 3, 2025</span><span>5 min read</span></div>
+    </a>
+    <a class="poem-card" href="#" data-format="voice">
+      <p class="poem-card-tag">Voice &middot; Spiritual</p>
+      <h3 class="poem-card-title">Prayer Between Two Breaths</h3>
+      <p class="poem-card-excerpt">A spoken-word piece on faith, surrender, and the sound of healing when language is almost too small for it.</p>
+      <div class="poem-card-meta"><span>Feb 2, 2025</span><span>4 min listen</span></div>
+    </a>
+    <a class="poem-card" href="#" data-format="article">
+      <p class="poem-card-tag">Article &middot; Love</p>
       <h3 class="poem-card-title">I love her again - Jcole</h3>
       <p class="poem-card-excerpt">Back when I was just a jit hangin' on thе strip (Boom)<br>
 She's the girl that I would see in evеry nigga's whip (Boom)<br>
@@ -1183,10 +1393,10 @@ I was much too young to truly know what constitutes<br>
 The difference 'tween the girl next door and or a prostitute (Yeah)<br>
 I heard some older brothers say they knew her from before<br>
 She lost her common sense when niggas</p>
-      <div class="poem-card-meta"><span>Dec 31, 2024</span><span>2 min read</span></div>
+      <div class="poem-card-meta"><span>Dec 31, 2024</span><span>5 min read</span></div>
     </a>
-    <a class="poem-card" href="#">
-      <p class="poem-card-tag">Spiritual</p>
+    <a class="poem-card" href="#" data-format="poem">
+      <p class="poem-card-tag">Poem &middot; Spiritual</p>
       <h3 class="poem-card-title">Reincarnated by Kendrick Lamar</h3>
       <p class="poem-card-excerpt">I got this fire burnin' in me from within<br>
 Concentrated thoughts on who I used to be, I'm sheddin' skin
@@ -1198,29 +1408,14 @@ Truth be told, I've been battling myself
 Tryna navigate the real and fake</p>
       <div class="poem-card-meta"><span>Dec 18, 2024</span><span>3 min read</span></div>
     </a>
-    <a class="poem-card" href="#">
-      <p class="poem-card-tag">Loss</p>
+    <a class="poem-card" href="#" data-format="article">
+      <p class="poem-card-tag">Article &middot; Loss</p>
       <h3 class="poem-card-title">What Grief Taught Me to Keep</h3>
       <p class="poem-card-excerpt">grief is a hoarder - it keeps everything: the way you laughed, the specific weight of your absence on a Tuesday afternoon...</p>
-      <div class="poem-card-meta"><span>Nov 29, 2024</span><span>4 min read</span></div>
+      <div class="poem-card-meta"><span>Nov 29, 2024</span><span>7 min read</span></div>
     </a>
   </div>
 </section>
-
-<!-- COLLECTIONS -->
-<section id="collections">
-  <div class="fade-up">
-    <p class="section-label">&#10022; Curated</p>
-    <h2 class="section-title">Collections</h2>
-    <p class="section-sub">Poems grouped by the seasons they were born in.</p>
-  </div>
-  <div class="collections-grid fade-up">
-    <div class="collection-card"><p class="coll-number">01</p><h3 class="coll-title">Letters I Never Sent</h3><p class="coll-count">12 poems</p></div>
-    <div class="collection-card"><p class="coll-number">03</p><h3 class="coll-title">Becoming</h3><p class="coll-count">15 poems</p></div>
-    <div class="collection-card"><p class="coll-number">04</p><h3 class="coll-title">Healing After</h3><p class="coll-count">10 poems</p></div>
-  </div>
-</section>
-
 <!-- ABOUT -->
 <section id="about">
   <div class="fade-up">
@@ -1301,7 +1496,7 @@ Tryna navigate the real and fake</p>
 
 <!-- FOOTER -->
 <footer>
-  &copy;  mutashi2@gmail.com ;2026 <span>MutashiWrites</span> - All poems are mine. All rights reserved.
+  &copy;  imutashi2@gmail.com ;2026 <span>MutashiWrites</span> - All poems are mine. All rights reserved.
 </footer>
 
 <script>
@@ -1317,8 +1512,19 @@ Tryna navigate the real and fake</p>
   const navToggle = document.querySelector('.nav-toggle');
   const navScrim = document.querySelector('.nav-scrim');
   const navLinksContainer = document.querySelector('.nav-links');
-  const filterButtons = document.querySelectorAll('.filter-btn');
+  const writerEntry = document.getElementById('writer-entry');
+  const navFormatLinks = document.querySelectorAll('[data-nav-format]');
+  const formatButtons = document.querySelectorAll('.format-btn');
+  const themeButtons = document.querySelectorAll('.filter-bar:not(.format-filter) .filter-btn');
+  const exploreLinks = document.querySelectorAll('[data-explore-format]');
+  const authorStudio = document.getElementById('author-studio');
   const authorForm = document.getElementById('author-form');
+  const authorFormat = document.getElementById('author-format');
+  const authorTitle = document.getElementById('author-title');
+  const authorExcerpt = document.getElementById('author-excerpt');
+  const authorReadTime = document.getElementById('author-read-time');
+  const publishButton = document.getElementById('publish-button');
+  const authorTypeNote = document.getElementById('author-type-note');
   const clearPostsBtn = document.getElementById('clear-posts');
   const authorStatus = document.getElementById('author-status');
   const newsletterForm = document.getElementById('newsletter-form');
@@ -1429,6 +1635,7 @@ Tryna navigate the real and fake</p>
 
   const toCardModel = (post = {}) => ({
     id: post.id,
+    format: post.format || 'poem',
     title: post.title,
     theme: post.theme,
     excerpt: post.excerpt || '',
@@ -1481,8 +1688,9 @@ Tryna navigate the real and fake</p>
     card.href = '#';
     card.dataset.userPost = 'true';
     card.dataset.category = post.theme.toLowerCase();
+    card.dataset.format = (post.format || 'poem').toLowerCase();
     card.innerHTML = `
-      <p class="poem-card-tag">${escapeHtml(post.theme)}</p>
+      <p class="poem-card-tag">${escapeHtml(`${(post.format || 'poem').replace(/^./, (c) => c.toUpperCase())} | ${post.theme}`)}</p>
       <h3 class="poem-card-title">${escapeHtml(post.title)}</h3>
       <p class="poem-card-excerpt">${escapeHtml(post.excerpt)}</p>
       <div class="poem-card-meta">
@@ -1497,7 +1705,10 @@ Tryna navigate the real and fake</p>
     document.querySelectorAll('.poem-card').forEach((card) => {
       if (!card.dataset.category) {
         const tag = card.querySelector('.poem-card-tag');
-        card.dataset.category = tag ? tag.textContent.trim().toLowerCase() : 'all';
+        const tagText = tag ? tag.textContent.trim() : '';
+        const parts = tagText.split(/[|·]/).map((item) => item.trim().toLowerCase());
+        card.dataset.format = card.dataset.format || parts[0] || 'poem';
+        card.dataset.category = parts[1] || card.dataset.category || 'all';
       }
     });
   };
@@ -1519,16 +1730,70 @@ Tryna navigate the real and fake</p>
     }, 2500);
   };
 
-  const activeFilter = () => {
-    const active = document.querySelector('.filter-btn.active');
-    return active ? active.textContent.trim().toLowerCase() : 'all';
+  const activeTheme = () => {
+    const active = document.querySelector('.filter-bar:not(.format-filter) .filter-btn.active');
+    return active ? (active.dataset.theme || active.textContent.trim().toLowerCase()) : 'all';
+  };
+
+  const activeFormat = () => {
+    const active = document.querySelector('.format-btn.active');
+    return active ? (active.dataset.format || 'all') : 'all';
+  };
+
+  const updateAuthorForm = () => {
+    const format = authorFormat.value;
+    const presets = {
+      poem: {
+        title: 'Poem title',
+        excerpt: 'Write a short excerpt...',
+        time: '2 min read',
+        button: 'Publish Poem',
+        note: 'Now writing: Poem'
+      },
+      article: {
+        title: 'Article title',
+        excerpt: 'Write a short article summary...',
+        time: '5 min read',
+        button: 'Publish Article',
+        note: 'Now writing: Article'
+      },
+      voice: {
+        title: 'Voice piece title',
+        excerpt: 'Write a short voice description...',
+        time: '4 min listen',
+        button: 'Publish Voice',
+        note: 'Now writing: Voice'
+      }
+    };
+    const current = presets[format] || presets.poem;
+    authorTitle.placeholder = current.title;
+    authorExcerpt.placeholder = current.excerpt;
+    publishButton.textContent = current.button;
+    authorTypeNote.textContent = current.note;
+    if (!authorReadTime.value || authorReadTime.dataset.autoDefault === 'true') {
+      authorReadTime.value = current.time;
+      authorReadTime.dataset.autoDefault = 'true';
+    }
+  };
+
+  const setFormatFilter = (format) => {
+    formatButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.format === format));
+    applyFilter();
+  };
+
+  const revealAuthorStudio = () => {
+    authorStudio.classList.remove('is-hidden');
   };
 
   const applyFilter = () => {
-    const current = activeFilter();
+    const currentTheme = activeTheme();
+    const currentFormat = activeFormat();
     document.querySelectorAll('.poem-card').forEach((card) => {
       const category = (card.dataset.category || '').toLowerCase();
-      card.style.display = (current === 'all' || category === current) ? '' : 'none';
+      const format = (card.dataset.format || 'poem').toLowerCase();
+      const matchesTheme = currentTheme === 'all' || category === currentTheme;
+      const matchesFormat = currentFormat === 'all' || format === currentFormat;
+      card.style.display = (matchesTheme && matchesFormat) ? '' : 'none';
     });
   };
 
@@ -1569,20 +1834,57 @@ Tryna navigate the real and fake</p>
     if (window.innerWidth > 640) closeMobileNav();
   });
 
-  filterButtons.forEach((btn) => {
+  formatButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      filterButtons.forEach((b) => b.classList.remove('active'));
+      formatButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       applyFilter();
     });
   });
 
+  themeButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      themeButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter();
+    });
+  });
+
+  exploreLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      setFormatFilter(link.dataset.exploreFormat || 'all');
+    });
+  });
+
+  navFormatLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      setFormatFilter(link.dataset.navFormat || 'all');
+    });
+  });
+
+  writerEntry.addEventListener('click', (event) => {
+    event.preventDefault();
+    revealAuthorStudio();
+    setFormatFilter('poem');
+    authorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  authorFormat.addEventListener('change', () => {
+    authorReadTime.dataset.autoDefault = 'true';
+    updateAuthorForm();
+  });
+
+  authorReadTime.addEventListener('input', () => {
+    authorReadTime.dataset.autoDefault = 'false';
+  });
+
   authorForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const title = document.getElementById('author-title').value.trim();
+    const format = authorFormat.value.trim();
+    const title = authorTitle.value.trim();
     const theme = document.getElementById('author-theme').value.trim();
-    const excerpt = document.getElementById('author-excerpt').value.trim();
-    const readTime = document.getElementById('author-read-time').value.trim() || '2 min read';
+    const excerpt = authorExcerpt.value.trim();
+    const readTime = authorReadTime.value.trim() || '2 min read';
 
     if (!title || !theme || !excerpt) {
       setStatus('Please fill in title, theme, and excerpt.');
@@ -1592,6 +1894,7 @@ Tryna navigate the real and fake</p>
     try {
       await createPost({
         id: generatePostId(),
+        format,
         title,
         theme,
         excerpt,
@@ -1599,7 +1902,9 @@ Tryna navigate the real and fake</p>
         createdAt: new Date().toISOString()
       });
       authorForm.reset();
-      document.getElementById('author-read-time').value = '2 min read';
+      authorFormat.value = 'poem';
+      authorReadTime.dataset.autoDefault = 'true';
+      updateAuthorForm();
       await renderSavedPosts();
       setStatus('Published.');
     } catch (error) {
@@ -1637,6 +1942,9 @@ Tryna navigate the real and fake</p>
   });
 
   syncCardCategories();
+  authorReadTime.dataset.autoDefault = 'true';
+  updateAuthorForm();
+  if (window.location.hash === '#author-studio') revealAuthorStudio();
   setBackendMode('PostgreSQL (Node API)');
   renderSavedPosts();
   refreshSubscribers();
@@ -1651,3 +1959,4 @@ Tryna navigate the real and fake</p>
 </script>
 </body>
 </html>
+
