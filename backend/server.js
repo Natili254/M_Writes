@@ -8,8 +8,6 @@ const { Pool } = require('pg');
 const PORT = Number(process.env.PORT || 3000);
 const BACKEND_DIR = __dirname;
 const FRONTEND_DIR = path.resolve(BACKEND_DIR, '..', 'frontend');
-const DATA_DIR = path.join(BACKEND_DIR, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'posts.json');
 const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
 const pgPool = hasPostgresConfig ? new Pool({
   connectionString: process.env.DATABASE_URL || undefined,
@@ -28,27 +26,6 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon'
 };
-
-function ensureDataStore() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
-}
-
-function readPosts() {
-  ensureDataStore();
-  try {
-    const raw = fs.readFileSync(DATA_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function writePosts(posts) {
-  ensureDataStore();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(posts, null, 2), 'utf8');
-}
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
@@ -152,9 +129,18 @@ async function handleApi(req, res) {
     return;
   }
 
+  if (!pgPool) {
+    sendJson(res, 503, { error: 'PostgreSQL is not configured on the server.' });
+    return;
+  }
+
   if (req.method === 'GET') {
-    const posts = readPosts().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    sendJson(res, 200, posts);
+    try {
+      const posts = await fetchPosts();
+      sendJson(res, 200, posts);
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Failed to load posts.' });
+    }
     return;
   }
 
@@ -167,27 +153,50 @@ async function handleApi(req, res) {
         return;
       }
 
-      const posts = readPosts();
-      posts.unshift(normalized);
-      writePosts(posts);
-      sendJson(res, 201, normalized);
+      const post = await createPost(normalized);
+      if (!post) {
+        sendJson(res, 500, { error: 'Failed to create post.' });
+        return;
+      }
+      sendJson(res, 201, post);
     } catch (error) {
-      sendJson(res, 400, { error: error.message || 'Invalid request body' });
+      const statusCode = error.message === 'Invalid JSON body' || error.message === 'Payload too large'
+        ? 400
+        : 500;
+      sendJson(res, statusCode, { error: error.message || 'Failed to create post.' });
     }
     return;
   }
 
   if (req.method === 'DELETE') {
-    writePosts([]);
-    sendNoContent(res);
+    try {
+      await clearPosts();
+      sendNoContent(res);
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Failed to clear posts.' });
+    }
     return;
   }
 
   sendJson(res, 405, { error: 'Method not allowed' });
 }
 
-async function ensureSubscribersTable() {
+async function ensureDatabase() {
   if (!pgPool) return;
+  await pgPool.query(`
+    CREATE TABLE IF NOT EXISTS posts (
+      id UUID PRIMARY KEY,
+      title TEXT NOT NULL,
+      theme TEXT NOT NULL,
+      excerpt TEXT NOT NULL,
+      read_time TEXT NOT NULL DEFAULT '2 min read',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pgPool.query(`
+    CREATE INDEX IF NOT EXISTS posts_created_at_idx
+    ON posts (created_at DESC)
+  `);
   await pgPool.query(`
     CREATE TABLE IF NOT EXISTS subscribers (
       id UUID PRIMARY KEY,
@@ -195,6 +204,50 @@ async function ensureSubscribersTable() {
       subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await pgPool.query(`
+    CREATE INDEX IF NOT EXISTS subscribers_subscribed_at_idx
+    ON subscribers (subscribed_at DESC)
+  `);
+}
+
+async function fetchPosts() {
+  const { rows } = await pgPool.query(`
+    SELECT id, title, theme, excerpt, read_time, created_at
+    FROM posts
+    ORDER BY created_at DESC
+  `);
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    theme: row.theme,
+    excerpt: row.excerpt,
+    readTime: row.read_time,
+    createdAt: row.created_at
+  }));
+}
+
+async function createPost(post) {
+  const { rows } = await pgPool.query(`
+    INSERT INTO posts (id, title, theme, excerpt, read_time, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id, title, theme, excerpt, read_time, created_at
+  `, [post.id, post.title, post.theme, post.excerpt, post.readTime, post.createdAt]);
+
+  const row = rows[0];
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    title: row.title,
+    theme: row.theme,
+    excerpt: row.excerpt,
+    readTime: row.read_time,
+    createdAt: row.created_at
+  };
+}
+
+async function clearPosts() {
+  await pgPool.query('DELETE FROM posts');
 }
 
 async function fetchSubscribers() {
@@ -296,16 +349,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, async () => {
-  ensureDataStore();
   if (pgPool) {
     try {
-      await ensureSubscribersTable();
-      console.log('PostgreSQL subscribers table is ready.');
+      await ensureDatabase();
+      console.log('PostgreSQL tables are ready.');
     } catch (error) {
-      console.error('Failed to initialize PostgreSQL subscribers table:', error.message);
+      console.error('Failed to initialize PostgreSQL tables:', error.message);
     }
   } else {
-    console.warn('PostgreSQL not configured. /api/subscribers will return 503.');
+    console.warn('PostgreSQL not configured. API routes will return 503.');
   }
   console.log(`Server running at http://localhost:${PORT}`);
 });

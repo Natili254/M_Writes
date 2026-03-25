@@ -7,23 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #1a1410;
-    --parchment: #f5f0e8;
-    --dust: #e8e0d0;
-    --gold: #b89a6a;
-    --rose: #c4887a;
-    --sage: #7a9070;
-    --muted: #8a7f72;
-    --paper: #faf7f2;
+    --ink: #16100d;
+    --parchment: #e8dcc7;
+    --dust: #d4c1a2;
+    --gold: #9f7c46;
+    --rose: #9f5f52;
+    --sage: #536750;
+    --muted: #52463a;
+    --paper: #efe3d2;
+    --paper-deep: #e4d4bf;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     font-family: 'Jost', sans-serif;
-    background: var(--paper);
+    background:
+      radial-gradient(circle at top, rgba(159, 124, 70, 0.08), transparent 34%),
+      linear-gradient(180deg, #f1e6d6 0%, #e7d8c1 100%);
     color: var(--ink);
-    font-weight: 300;
+    font-weight: 400;
     overflow-x: hidden;
   }
 
@@ -36,7 +39,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.4rem 4rem;
-    background: rgba(250,247,242,0.92);
+    background: rgba(239,227,210,0.95);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(184,154,106,0.15);
     transition: padding .3s;
@@ -84,7 +87,7 @@
     font-size: .72rem;
     letter-spacing: .22em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #43372d;
     text-decoration: none;
     transition: color .25s;
     position: relative;
@@ -144,7 +147,7 @@
   .hero-sub {
     font-size: .95rem;
     line-height: 1.9;
-    color: var(--muted);
+    color: #3f342b;
     max-width: 400px;
     margin-bottom: 2.8rem;
   }
@@ -185,11 +188,11 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--paper);
+    background: #f4eadc;
     padding: 3rem;
     max-width: 340px;
     width: 90%;
-    box-shadow: 0 24px 80px rgba(26,20,16,.12);
+    box-shadow: 0 24px 80px rgba(26,20,16,.18);
     border-top: 3px solid var(--gold);
   }
   .poem-label {
@@ -210,7 +213,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.05rem;
     line-height: 2;
-    color: var(--muted);
+    color: #41362d;
     border-left: 2px solid var(--dust);
     padding-left: 1.2rem;
     font-style: italic;
@@ -250,14 +253,14 @@
   }
   .section-sub {
     font-size: .9rem;
-    color: var(--muted);
+    color: #4a3f35;
     line-height: 1.85;
     max-width: 520px;
     margin-bottom: 3rem;
   }
 
   /* POEMS */
-  #poems { background: var(--parchment); }
+  #poems { background: linear-gradient(180deg, #e8dcc7 0%, #e2d2b9 100%); }
   .filter-bar { display: flex; gap: .8rem; flex-wrap: wrap; margin-bottom: 3rem; }
   .filter-btn {
     font-size: .65rem;
@@ -266,7 +269,7 @@
     padding: .5rem 1.2rem;
     border: 1px solid var(--dust);
     background: transparent;
-    color: var(--muted);
+    color: #4c4137;
     cursor: pointer;
     transition: all .2s;
     font-family: 'Jost', sans-serif;
@@ -282,8 +285,8 @@
     gap: 2rem;
   }
   .author-studio {
-    background: var(--paper);
-    border: 1px solid var(--dust);
+    background: #f2e7d8;
+    border: 1px solid #cbb48f;
     padding: 1.6rem;
     margin-bottom: 2rem;
   }
@@ -294,7 +297,7 @@
     font-weight: 400;
   }
   .author-studio p {
-    color: var(--muted);
+    color: #493d33;
     font-size: .85rem;
     margin-bottom: 1rem;
     line-height: 1.6;
@@ -309,8 +312,8 @@
   .author-form textarea,
   .author-form select {
     width: 100%;
-    border: 1px solid var(--dust);
-    background: #fff;
+    border: 1px solid #bea37c;
+    background: #fbf4eb;
     padding: .75rem .8rem;
     font: inherit;
     color: var(--ink);
@@ -345,14 +348,14 @@
     font-size: .78rem;
     letter-spacing: .15em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #4a3f35;
   }
   .subscriber-list {
     list-style: none;
-    border: 1px solid var(--dust);
+    border: 1px solid #bea37c;
     max-height: 220px;
     overflow-y: auto;
-    background: #fff;
+    background: #fbf4eb;
   }
   .subscriber-list li {
     display: flex;
@@ -361,7 +364,7 @@
     padding: .6rem .75rem;
     border-bottom: 1px solid var(--dust);
     font-size: .78rem;
-    color: var(--muted);
+    color: #43382f;
   }
   .subscriber-list li:last-child {
     border-bottom: 0;
@@ -382,7 +385,7 @@
     .poems-grid { grid-template-columns: 1fr; }
   }
   .poem-card {
-    background: var(--paper);
+    background: #f4eadc;
     padding: 2.2rem;
     border-bottom: 2px solid transparent;
     transition: all .3s;
@@ -394,7 +397,7 @@
   .poem-card:hover {
     border-bottom-color: var(--rose);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(26,20,16,.08);
+    box-shadow: 0 14px 42px rgba(26,20,16,.16);
   }
   .poem-card-tag {
     font-size: .6rem;
@@ -414,7 +417,7 @@
   .poem-card-excerpt {
     font-size: .85rem;
     line-height: 1.85;
-    color: var(--muted);
+    color: #463a31;
     margin-bottom: 1.5rem;
   }
   .poem-card-meta {
@@ -423,20 +426,20 @@
     font-size: .62rem;
     letter-spacing: .15em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #5a4d41;
   }
 
   /* COLLECTIONS */
   #collections { background: var(--ink); color: var(--paper); }
   #collections .section-title { color: var(--paper); }
-  #collections .section-sub { color: rgba(250,247,242,.55); }
+  #collections .section-sub { color: rgba(250,247,242,.8); }
   .collections-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
   }
   .collection-card {
-    border: 1px solid rgba(250,247,242,.12);
+    border: 1px solid rgba(250,247,242,.22);
     padding: 2.5rem 1.8rem;
     transition: all .3s;
     cursor: pointer;
@@ -459,7 +462,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 3.5rem;
     font-weight: 300;
-    color: rgba(184,154,106,.2);
+    color: rgba(184,154,106,.38);
     margin-bottom: 1rem;
     line-height: 1;
   }
@@ -474,11 +477,12 @@
     font-size: .6rem;
     letter-spacing: .25em;
     text-transform: uppercase;
-    color: rgba(250,247,242,.4);
+    color: rgba(250,247,242,.7);
   }
 
   /* ABOUT */
   #about {
+    background: linear-gradient(180deg, #efe3d2 0%, #e7d7c0 100%);
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: 6rem;
@@ -545,7 +549,7 @@
   .about-body {
     font-size: .9rem;
     line-height: 2;
-    color: var(--muted);
+    color: #463a31;
     margin-bottom: 1.5rem;
   }
   .about-themes {
@@ -560,7 +564,7 @@
     text-transform: uppercase;
     padding: .4rem 1rem;
     border: 1px solid var(--dust);
-    color: var(--muted);
+    color: #4f4338;
   }
 
   /* SPOKEN WORD */
@@ -609,14 +613,14 @@
 
   /* NEWSLETTER */
   #newsletter {
-    background: var(--rose);
+    background: linear-gradient(135deg, #8a4f44 0%, #704339 100%);
     color: var(--paper);
     text-align: center;
     padding: 6rem;
   }
-  #newsletter .section-label { color: rgba(250,247,242,.7); }
+  #newsletter .section-label { color: rgba(250,247,242,.85); }
   #newsletter .section-title { color: var(--paper); max-width: 600px; margin: 0 auto 1rem; }
-  #newsletter .section-sub { color: rgba(250,247,242,.75); margin: 0 auto 2.5rem; }
+  #newsletter .section-sub { color: rgba(250,247,242,.9); margin: 0 auto 2.5rem; }
   .newsletter-form {
     display: flex;
     max-width: 440px;
@@ -627,13 +631,13 @@
     flex: 1;
     padding: .9rem 1.2rem;
     border: none;
-    background: rgba(250,247,242,.2);
+    background: rgba(250,247,242,.26);
     color: var(--paper);
     font-family: 'Jost', sans-serif;
     font-size: .85rem;
     outline: none;
   }
-  .newsletter-form input::placeholder { color: rgba(250,247,242,.55); }
+  .newsletter-form input::placeholder { color: rgba(250,247,242,.72); }
   .newsletter-form button {
     padding: .9rem 1.5rem;
     background: var(--ink);
@@ -680,7 +684,7 @@
   }
   .event-info p {
     font-size: .78rem;
-    color: var(--muted);
+    color: #493d33;
     letter-spacing: .05em;
   }
   .event-tag {
@@ -703,7 +707,7 @@
     padding: 7rem 6rem;
   }
   #contact .section-title { color: var(--paper); }
-  #contact .section-sub { color: rgba(250,247,242,.55); }
+  #contact .section-sub { color: rgba(250,247,242,.82); }
   .contact-details { margin-top: 2rem; }
   .contact-item {
     display: flex;
@@ -721,7 +725,7 @@
     font-size: .85rem;
     flex-shrink: 0;
   }
-  .contact-item p { font-size: .85rem; color: rgba(250,247,242,.6); line-height: 1.6; }
+  .contact-item p { font-size: .85rem; color: rgba(250,247,242,.84); line-height: 1.6; }
   .socials { display: flex; gap: 1rem; margin-top: 2.5rem; }
   .social-link {
     width: 40px;
@@ -730,7 +734,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(250,247,242,.6);
+    color: rgba(250,247,242,.82);
     text-decoration: none;
     font-size: .75rem;
     transition: all .25s;
@@ -748,14 +752,14 @@
     font-size: .62rem;
     letter-spacing: .25em;
     text-transform: uppercase;
-    color: rgba(250,247,242,.4);
+    color: rgba(250,247,242,.7);
     margin-bottom: .5rem;
   }
   .form-group input,
   .form-group textarea {
     width: 100%;
-    background: rgba(250,247,242,.06);
-    border: 1px solid rgba(250,247,242,.12);
+    background: rgba(250,247,242,.1);
+    border: 1px solid rgba(250,247,242,.22);
     padding: .9rem 1rem;
     color: var(--paper);
     font-family: 'Jost', sans-serif;
@@ -785,7 +789,7 @@
   /* FOOTER */
   footer {
     background: #120e0a;
-    color: rgba(250,247,242,.35);
+    color: rgba(250,247,242,.62);
     text-align: center;
     padding: 2.5rem;
     font-size: .65rem;
@@ -1292,11 +1296,11 @@ Tryna navigate the real and fake</p>
 </footer>
 
 <script>
-  const STORAGE_KEY = 'MutashiWrites_author_posts_v1';
-  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    && window.location.port !== '3000'
-    ? 'http://localhost:3000'
-    : '';
+  const API_BASE_URL = window.API_BASE_URL
+    || (((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      && window.location.port !== '3000')
+      ? 'http://localhost:3000'
+      : '');
   const POSTS_API_URL = `${API_BASE_URL}/api/posts`;
 
   const poemsGrid = document.querySelector('.poems-grid');
@@ -1314,7 +1318,6 @@ Tryna navigate the real and fake</p>
   const subscriberListEl = document.getElementById('subscriber-list');
   const subscriberStatusEl = document.getElementById('subscriber-status');
   const backendMode = document.getElementById('backend-mode');
-  let apiHealthy = false;
 
   const toSafeText = (value) => String(value ?? '');
   const escapeHtml = (value) => toSafeText(value)
@@ -1330,16 +1333,6 @@ Tryna navigate the real and fake</p>
     day: 'numeric',
     year: 'numeric'
   });
-
-  const localLoadPosts = () => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch {
-      return [];
-    }
-  };
-
-  const localSavePosts = (posts) => localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
 
   const setBackendMode = (mode) => {
     backendMode.textContent = mode;
@@ -1438,8 +1431,6 @@ Tryna navigate the real and fake</p>
     if (!response.ok) throw new Error('API unavailable');
     const posts = await response.json();
     if (!Array.isArray(posts)) throw new Error('Invalid API response');
-    apiHealthy = true;
-    setBackendMode('Online (Node API)');
     return posts.map(toCardModel);
   };
 
@@ -1452,8 +1443,6 @@ Tryna navigate the real and fake</p>
       body: JSON.stringify(post)
     });
     if (!response.ok) throw new Error('API publish failed');
-    apiHealthy = true;
-    setBackendMode('Online (Node API)');
   };
 
   const clearRemotePosts = async () => {
@@ -1462,42 +1451,18 @@ Tryna navigate the real and fake</p>
       headers: { 'Content-Type': 'application/json' }
     });
     if (!response.ok) throw new Error('API clear failed');
-    apiHealthy = true;
-    setBackendMode('Online (Node API)');
   };
 
   const loadPosts = async () => {
-    try {
-      return await fetchRemotePosts();
-    } catch {
-      apiHealthy = false;
-      setBackendMode('Local only (API offline)');
-      return localLoadPosts();
-    }
+    return fetchRemotePosts();
   };
 
   const createPost = async (post) => {
-    try {
-      await saveRemotePost(post);
-      return;
-    } catch {
-      apiHealthy = false;
-      const posts = localLoadPosts();
-      posts.unshift(post);
-      localSavePosts(posts);
-      setBackendMode('Local only (API offline)');
-    }
+    await saveRemotePost(post);
   };
 
   const clearPosts = async () => {
-    try {
-      await clearRemotePosts();
-      return;
-    } catch {
-      apiHealthy = false;
-      localStorage.removeItem(STORAGE_KEY);
-      setBackendMode('Local only (API offline)');
-    }
+    await clearRemotePosts();
   };
 
   const buildUserPostCard = (post) => {
@@ -1576,6 +1541,12 @@ Tryna navigate the real and fake</p>
     if (!navElement.contains(event.target)) closeMobileNav();
   });
 
+  document.querySelectorAll('a[href="#"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
+  });
+
   window.addEventListener('resize', () => {
     if (window.innerWidth > 640) closeMobileNav();
   });
@@ -1648,7 +1619,7 @@ Tryna navigate the real and fake</p>
   });
 
   syncCardCategories();
-  setBackendMode('Checking Node API...');
+  setBackendMode('PostgreSQL (Node API)');
   renderSavedPosts();
   refreshSubscribers();
 
