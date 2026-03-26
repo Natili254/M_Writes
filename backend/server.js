@@ -80,6 +80,10 @@ function normalizeEmail(rawEmail) {
 }
 
 function normalizePost(input) {
+  const allowedFormats = new Set(['poem', 'article', 'voice']);
+  const format = allowedFormats.has(String(input.format || '').trim().toLowerCase())
+    ? String(input.format).trim().toLowerCase()
+    : 'poem';
   const title = String(input.title || '').trim();
   const theme = String(input.theme || '').trim();
   const excerpt = String(input.excerpt || '').trim();
@@ -92,6 +96,7 @@ function normalizePost(input) {
 
   return {
     id: input.id || (typeof randomUUID === 'function' ? randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+    format,
     title,
     theme,
     excerpt,
@@ -186,12 +191,17 @@ async function ensureDatabase() {
   await pgPool.query(`
     CREATE TABLE IF NOT EXISTS posts (
       id UUID PRIMARY KEY,
+      format TEXT NOT NULL DEFAULT 'poem',
       title TEXT NOT NULL,
       theme TEXT NOT NULL,
       excerpt TEXT NOT NULL,
       read_time TEXT NOT NULL DEFAULT '2 min read',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
+  `);
+  await pgPool.query(`
+    ALTER TABLE posts
+    ADD COLUMN IF NOT EXISTS format TEXT NOT NULL DEFAULT 'poem'
   `);
   await pgPool.query(`
     CREATE INDEX IF NOT EXISTS posts_created_at_idx
@@ -212,12 +222,13 @@ async function ensureDatabase() {
 
 async function fetchPosts() {
   const { rows } = await pgPool.query(`
-    SELECT id, title, theme, excerpt, read_time, created_at
+    SELECT id, format, title, theme, excerpt, read_time, created_at
     FROM posts
     ORDER BY created_at DESC
   `);
   return rows.map((row) => ({
     id: row.id,
+    format: row.format || 'poem',
     title: row.title,
     theme: row.theme,
     excerpt: row.excerpt,
@@ -228,16 +239,17 @@ async function fetchPosts() {
 
 async function createPost(post) {
   const { rows } = await pgPool.query(`
-    INSERT INTO posts (id, title, theme, excerpt, read_time, created_at)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id, title, theme, excerpt, read_time, created_at
-  `, [post.id, post.title, post.theme, post.excerpt, post.readTime, post.createdAt]);
+    INSERT INTO posts (id, format, title, theme, excerpt, read_time, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING id, format, title, theme, excerpt, read_time, created_at
+  `, [post.id, post.format, post.title, post.theme, post.excerpt, post.readTime, post.createdAt]);
 
   const row = rows[0];
   if (!row) return null;
 
   return {
     id: row.id,
+    format: row.format || 'poem',
     title: row.title,
     theme: row.theme,
     excerpt: row.excerpt,

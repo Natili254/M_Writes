@@ -2,6 +2,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE IF NOT EXISTS posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  format TEXT NOT NULL DEFAULT 'poem',
   title TEXT NOT NULL,
   theme TEXT NOT NULL,
   excerpt TEXT NOT NULL,
