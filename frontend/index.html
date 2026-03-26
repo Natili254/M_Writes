@@ -192,7 +192,9 @@
     text-transform: uppercase;
     backdrop-filter: blur(8px);
     box-shadow: 0 16px 36px rgba(15, 11, 8, 0.26);
+    display: none;
   }
+  body.owner-mode .writer-entry { display: inline-flex; }
   .writer-entry:hover {
     background: rgba(159, 124, 70, 0.96);
   }
@@ -822,51 +824,6 @@
   }
   .newsletter-form button:hover { background: rgba(26,20,16,.7); }
 
-  /* EVENTS */
-  #events {}
-  .events-list { max-width: 700px; }
-  .event-item {
-    display: grid;
-    grid-template-columns: 80px 1fr auto;
-    gap: 2rem;
-    align-items: center;
-    padding: 1.8rem 0;
-    border-bottom: 1px solid var(--dust);
-  }
-  .event-date { text-align: center; }
-  .event-date .day {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem;
-    font-weight: 300;
-    line-height: 1;
-    color: var(--gold);
-  }
-  .event-date .month {
-    font-size: .6rem;
-    letter-spacing: .25em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .event-info h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    margin-bottom: .3rem;
-  }
-  .event-info p {
-    font-size: .78rem;
-    color: #493d33;
-    letter-spacing: .05em;
-  }
-  .event-tag {
-    font-size: .6rem;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    padding: .35rem .9rem;
-    border: 1px solid var(--sage);
-    color: var(--sage);
-    white-space: nowrap;
-  }
-
   /* CONTACT */
   #contact {
     background: var(--ink);
@@ -1011,13 +968,14 @@
       padding-top: 130px;
       background-position: center top;
       background-size: cover, cover, 100% auto;
+      row-gap: 0;
     }
     .hero-left {
-      padding: 3.5rem 1.5rem 2rem;
+      padding: 2.25rem 1.5rem 1rem;
     }
     .hero-right {
-      min-height: 60vh;
-      padding: 1.5rem;
+      min-height: 36vh;
+      padding: .75rem 1.5rem 1.5rem;
     }
     .hero-poem-card {
       width: min(560px, 100%);
@@ -1047,9 +1005,8 @@
       letter-spacing: .16em;
     }
     .nav-cta {
-      margin-left: auto;
       font-size: .62rem;
-      padding: .5rem 1rem;
+      padding: .5rem .9rem;
     }
     .hero-eyebrow {
       letter-spacing: .2em;
@@ -1149,23 +1106,6 @@
     .newsletter-form button {
       width: 100%;
     }
-    .event-item {
-      grid-template-columns: 1fr;
-      gap: .75rem;
-      align-items: flex-start;
-    }
-    .event-date {
-      text-align: left;
-      display: flex;
-      align-items: baseline;
-      gap: .55rem;
-    }
-    .event-date .day {
-      font-size: 1.8rem;
-    }
-    .event-tag {
-      margin-top: .25rem;
-    }
     footer {
       font-size: .55rem;
       letter-spacing: .1em;
@@ -1183,12 +1123,20 @@
     }
     .nav-toggle {
       display: inline-flex;
-      margin-left: auto;
+      order: 3;
+      margin-left: .35rem;
       position: relative;
       z-index: 103;
     }
     .nav-cta {
-      display: none;
+      display: inline-flex;
+      order: 2;
+      margin-left: auto;
+      font-size: .6rem;
+      padding: .52rem .85rem;
+      letter-spacing: .16em;
+      position: relative;
+      z-index: 103;
     }
     .nav-scrim {
       position: fixed;
@@ -1309,19 +1257,24 @@
       padding: .68rem .9rem;
       z-index: 99;
     }
+    .nav-cta {
+      font-size: .56rem;
+      padding: .5rem .72rem;
+      letter-spacing: .12em;
+    }
     #home {
       padding-top: 95px;
       background-position: center top;
       background-size: cover, cover, auto 100%;
     }
     .hero-right {
-      min-height: 44vh;
+      min-height: 28vh;
       align-items: flex-end;
-      padding: 1rem;
+      padding: .35rem 1rem 1rem;
     }
     .hero-poem-card {
       width: 100%;
-      padding: 1rem 1rem 1.1rem;
+      padding: .9rem .95rem 1rem;
     }
     .poem-title {
       font-size: 1.25rem;
@@ -1358,7 +1311,6 @@
       </ul>
     </li>
     <li><a href="#about">About</a></li>
-    <li><a href="#events">Events</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a class="nav-cta" href="#newsletter">Subscribe</a>
@@ -1591,15 +1543,7 @@ Tryna navigate the real and fake</p>
       </a>
     </div>
   </div>
-  <div class="contact-form-side fade-up">
-    <div class="form-group"><label>Your Name</label><input type="text" placeholder="Name"></div>
-    <div class="form-group"><label>Email</label><input type="email" placeholder="email@example.com"></div>
-    <div class="form-group"><label>Subject</label><input type="text" placeholder="Collaboration / Speaking / Just Hello"></div>
-    <div class="form-group"><label>Message</label><textarea placeholder="Write to me..."></textarea></div>
-    <button class="form-submit">Send Message</button>
-  </div>
 </section>
-
 <!-- FOOTER -->
 <footer>
   &copy;  imutashi2@gmail.com ;2026 <span>MutashiWrites</span> - All poems are mine. All rights reserved.
@@ -1650,6 +1594,12 @@ Tryna navigate the real and fake</p>
     .replaceAll("'", '&#39;');
   const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
   const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
+  const OWNER_MODE_KEY = 'mw-owner-mode';
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('owner') === '1') localStorage.setItem(OWNER_MODE_KEY, 'true');
+  if (urlParams.get('owner') === '0') localStorage.removeItem(OWNER_MODE_KEY);
+  const isOwnerMode = localStorage.getItem(OWNER_MODE_KEY) === 'true';
+  document.body.classList.toggle('owner-mode', isOwnerMode);
 
   const formatDate = (isoDate) => new Date(isoDate).toLocaleDateString('en-US', {
     month: 'short',
@@ -1994,6 +1944,7 @@ Tryna navigate the real and fake</p>
   };
 
   const revealAuthorStudio = () => {
+    if (!isOwnerMode) return;
     authorStudio.classList.remove('is-hidden');
   };
 
@@ -2074,7 +2025,7 @@ Tryna navigate the real and fake</p>
     });
   });
 
-  writerEntry.addEventListener('click', (event) => {
+  writerEntry?.addEventListener('click', (event) => {
     event.preventDefault();
     revealAuthorStudio();
     setFormatFilter('poem');
@@ -2236,7 +2187,7 @@ Tryna navigate the real and fake</p>
   enhanceReaderCards();
   authorReadTime.dataset.autoDefault = 'true';
   updateAuthorForm();
-  if (window.location.hash === '#author-studio') revealAuthorStudio();
+  if (isOwnerMode && window.location.hash === '#author-studio') revealAuthorStudio();
   setBackendMode('PostgreSQL (Node API)');
   renderSavedPosts();
   refreshSubscribers();

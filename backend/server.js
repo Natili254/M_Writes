@@ -344,7 +344,7 @@ const server = http.createServer(async (req, res) => {
     sendText(res, 405, 'Method Not Allowed');
     return;
   }
-
+- 8 
   serveStatic(req, res, pathname);
 });
 
