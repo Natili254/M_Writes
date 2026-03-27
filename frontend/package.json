@@ -1,0 +1,9 @@
+{
+  "name": "mutashi-writes-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend + Vercel serverless API for Mutashi Writes",
+  "dependencies": {
+    "pg": "^8.12.0"
+  }
+}
