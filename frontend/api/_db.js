@@ -4,7 +4,9 @@ const { randomUUID } = require('crypto');
 const { Pool } = require('pg');
 
 const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
-const FILE_STORE_PATH = path.resolve(__dirname, '..', '..', 'backend', 'data', 'content.json');
+const FILE_STORE_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'mutashiii-content.json')
+  : path.resolve(__dirname, '..', '..', 'backend', 'data', 'content.json');
 
 let pool;
 

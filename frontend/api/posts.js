@@ -1,5 +1,4 @@
 const {
-  hasPostgresConfig,
   sendJson,
   sendNoContent,
   parseRequestBody,
@@ -13,11 +12,6 @@ const {
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
     sendNoContent(res);
-    return;
-  }
-
-  if (!hasPostgresConfig) {
-    sendJson(res, 503, { error: 'PostgreSQL is not configured on the server.' });
     return;
   }
 

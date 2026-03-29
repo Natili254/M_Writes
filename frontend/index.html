@@ -839,6 +839,19 @@
     transition: background .25s;
   }
   .newsletter-form button:hover { background: rgba(26,20,16,.7); }
+  .newsletter-form button:disabled {
+    cursor: wait;
+    opacity: .72;
+  }
+  .newsletter-status {
+    min-height: 1.2rem;
+    margin-top: .9rem;
+    font-size: .82rem;
+    color: rgba(250,247,242,.92);
+  }
+  .nav-mobile-subscribe {
+    display: none;
+  }
 
   /* EVENTS */
   #events {}
@@ -1214,6 +1227,9 @@
     .nav-cta {
       display: none;
     }
+    .nav-mobile-subscribe {
+      display: list-item;
+    }
     .nav-scrim {
       position: fixed;
       inset: 0;
@@ -1384,6 +1400,7 @@
     <li><a href="#about">About</a></li>
     <li><a href="#events">Events</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li class="nav-mobile-subscribe"><a href="#newsletter">Subscribe</a></li>
   </ul>
   <a class="nav-cta" href="#newsletter">Subscribe</a>
 </nav>
@@ -1583,8 +1600,9 @@ Tryna navigate the real and fake</p>
   <p class="section-sub">Join a quiet corner of the internet where poetry arrives in your inbox like a letter from a friend.</p>
   <form class="newsletter-form" id="newsletter-form">
     <input type="email" id="newsletter-email" placeholder="your@email.com" required>
-    <button type="submit">Subscribe</button>
+    <button type="submit" id="newsletter-submit">Subscribe</button>
   </form>
+  <p class="newsletter-status" id="newsletter-status" aria-live="polite"></p>
 </section>
 
 
@@ -1627,7 +1645,7 @@ Tryna navigate the real and fake</p>
     || (((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       && window.location.port !== '3000')
       ? 'http://localhost:3000'
-      : 'https://m-writes.onrender.com');
+      : '');
   const POSTS_API_URL = `${API_BASE_URL}/api/posts`;
 
   const poemsGrid = document.querySelector('.poems-grid');
@@ -1653,6 +1671,8 @@ Tryna navigate the real and fake</p>
   const authorStatus = document.getElementById('author-status');
   const newsletterForm = document.getElementById('newsletter-form');
   const newsletterEmail = document.getElementById('newsletter-email');
+  const newsletterSubmit = document.getElementById('newsletter-submit');
+  const newsletterStatus = document.getElementById('newsletter-status');
   const refreshSubscribersBtn = document.getElementById('refresh-subscribers');
   const subscriberCountEl = document.getElementById('subscriber-count');
   const subscriberListEl = document.getElementById('subscriber-list');
@@ -1695,8 +1715,10 @@ Tryna navigate the real and fake</p>
 
   const setSubscriberStatus = (message) => {
     subscriberStatusEl.textContent = message;
+    newsletterStatus.textContent = message;
     setTimeout(() => {
       if (subscriberStatusEl.textContent === message) subscriberStatusEl.textContent = '';
+      if (newsletterStatus.textContent === message) newsletterStatus.textContent = '';
     }, 2800);
   };
 
@@ -2245,12 +2267,18 @@ Tryna navigate the real and fake</p>
     if (!email) return;
 
     try {
+      newsletterSubmit.disabled = true;
+      newsletterSubmit.textContent = 'Saving...';
+      setSubscriberStatus('Adding subscriber...');
       const data = await createSubscriber(email);
       renderSubscribers(data);
       newsletterForm.reset();
       setSubscriberStatus(data.created ? 'Subscriber added.' : 'Subscriber already exists.');
     } catch (error) {
       setSubscriberStatus(error.message || 'Subscription failed.');
+    } finally {
+      newsletterSubmit.disabled = false;
+      newsletterSubmit.textContent = 'Subscribe';
     }
   });
 
