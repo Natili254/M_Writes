@@ -1,7 +1,10 @@
+const fs = require('fs/promises');
+const path = require('path');
 const { randomUUID } = require('crypto');
 const { Pool } = require('pg');
 
 const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
+const FILE_STORE_PATH = path.resolve(__dirname, '..', '..', 'backend', 'data', 'content.json');
 
 let pool;
 
@@ -72,7 +75,13 @@ function normalizePost(input) {
   const theme = String(input.theme || '').trim();
   const excerpt = String(input.excerpt || '').trim();
   const readTime = String(input.readTime || '2 min read').trim();
-  const createdAt = input.createdAt ? new Date(input.createdAt).toISOString() : new Date().toISOString();
+  const parsedCreatedAt = input.createdAt ? new Date(input.createdAt) : new Date();
+
+  if (Number.isNaN(parsedCreatedAt.getTime())) {
+    return { error: 'createdAt must be a valid date' };
+  }
+
+  const createdAt = parsedCreatedAt.toISOString();
 
   if (!title || !theme || !excerpt) {
     return { error: 'title, theme, and excerpt are required' };
@@ -89,9 +98,46 @@ function normalizePost(input) {
   };
 }
 
+async function ensureFileStore() {
+  await fs.mkdir(path.dirname(FILE_STORE_PATH), { recursive: true });
+  try {
+    await fs.access(FILE_STORE_PATH);
+  } catch {
+    await fs.writeFile(FILE_STORE_PATH, JSON.stringify({ posts: [], subscribers: [] }, null, 2));
+  }
+}
+
+async function readFileStore() {
+  await ensureFileStore();
+  const raw = await fs.readFile(FILE_STORE_PATH, 'utf8');
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      posts: Array.isArray(parsed.posts) ? parsed.posts : [],
+      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : []
+    };
+  } catch {
+    return { posts: [], subscribers: [] };
+  }
+}
+
+async function writeFileStore(data) {
+  await ensureFileStore();
+  const payload = {
+    posts: Array.isArray(data.posts) ? data.posts : [],
+    subscribers: Array.isArray(data.subscribers) ? data.subscribers : []
+  };
+
+  await fs.writeFile(FILE_STORE_PATH, JSON.stringify(payload, null, 2));
+}
+
 async function ensureDatabase() {
   const pgPool = getPool();
-  if (!pgPool) return;
+  if (!pgPool) {
+    await ensureFileStore();
+    return;
+  }
 
   await pgPool.query(`
     CREATE TABLE IF NOT EXISTS posts (
@@ -126,6 +172,11 @@ async function ensureDatabase() {
 }
 
 async function fetchPosts() {
+  if (!hasPostgresConfig) {
+    const store = await readFileStore();
+    return [...store.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
   const { rows } = await getPool().query(`
     SELECT id, format, title, theme, excerpt, read_time, created_at
     FROM posts
@@ -143,6 +194,13 @@ async function fetchPosts() {
 }
 
 async function createPost(post) {
+  if (!hasPostgresConfig) {
+    const store = await readFileStore();
+    store.posts.unshift(post);
+    await writeFileStore(store);
+    return post;
+  }
+
   const { rows } = await getPool().query(`
     INSERT INTO posts (id, format, title, theme, excerpt, read_time, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -164,10 +222,22 @@ async function createPost(post) {
 }
 
 async function clearPosts() {
+  if (!hasPostgresConfig) {
+    const store = await readFileStore();
+    store.posts = [];
+    await writeFileStore(store);
+    return;
+  }
+
   await getPool().query('DELETE FROM posts');
 }
 
 async function fetchSubscribers() {
+  if (!hasPostgresConfig) {
+    const store = await readFileStore();
+    return [...store.subscribers].sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt));
+  }
+
   const { rows } = await getPool().query(`
     SELECT email, subscribed_at
     FROM subscribers
@@ -180,6 +250,21 @@ async function fetchSubscribers() {
 }
 
 async function createSubscriber(email) {
+  if (!hasPostgresConfig) {
+    const store = await readFileStore();
+    const existing = store.subscribers.find((subscriber) => subscriber.email === email);
+    if (existing) return null;
+
+    const subscriber = {
+      email,
+      subscribedAt: new Date().toISOString()
+    };
+
+    store.subscribers.unshift(subscriber);
+    await writeFileStore(store);
+    return subscriber;
+  }
+
   const id = typeof randomUUID === 'function'
     ? randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;

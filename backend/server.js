@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
 const { randomUUID } = require('crypto');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
@@ -8,6 +9,7 @@ const { Pool } = require('pg');
 const PORT = Number(process.env.PORT || 3000);
 const BACKEND_DIR = __dirname;
 const FRONTEND_DIR = path.resolve(BACKEND_DIR, '..', 'frontend');
+const FILE_STORE_PATH = path.join(BACKEND_DIR, 'data', 'content.json');
 const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
 const pgPool = hasPostgresConfig ? new Pool({
   connectionString: process.env.DATABASE_URL || undefined,
@@ -88,7 +90,13 @@ function normalizePost(input) {
   const theme = String(input.theme || '').trim();
   const excerpt = String(input.excerpt || '').trim();
   const readTime = String(input.readTime || '2 min read').trim();
-  const createdAt = input.createdAt ? new Date(input.createdAt).toISOString() : new Date().toISOString();
+  const parsedCreatedAt = input.createdAt ? new Date(input.createdAt) : new Date();
+
+  if (Number.isNaN(parsedCreatedAt.getTime())) {
+    return { error: 'createdAt must be a valid date' };
+  }
+
+  const createdAt = parsedCreatedAt.toISOString();
 
   if (!title || !theme || !excerpt) {
     return { error: 'title, theme, and excerpt are required' };
@@ -103,6 +111,40 @@ function normalizePost(input) {
     readTime,
     createdAt
   };
+}
+
+async function ensureFileStore() {
+  await fsp.mkdir(path.dirname(FILE_STORE_PATH), { recursive: true });
+  try {
+    await fsp.access(FILE_STORE_PATH);
+  } catch {
+    await fsp.writeFile(FILE_STORE_PATH, JSON.stringify({ posts: [], subscribers: [] }, null, 2));
+  }
+}
+
+async function readFileStore() {
+  await ensureFileStore();
+  const raw = await fsp.readFile(FILE_STORE_PATH, 'utf8');
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      posts: Array.isArray(parsed.posts) ? parsed.posts : [],
+      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : []
+    };
+  } catch {
+    return { posts: [], subscribers: [] };
+  }
+}
+
+async function writeFileStore(data) {
+  await ensureFileStore();
+  const payload = {
+    posts: Array.isArray(data.posts) ? data.posts : [],
+    subscribers: Array.isArray(data.subscribers) ? data.subscribers : []
+  };
+
+  await fsp.writeFile(FILE_STORE_PATH, JSON.stringify(payload, null, 2));
 }
 
 function serveStatic(req, res, pathname) {
@@ -131,11 +173,6 @@ function serveStatic(req, res, pathname) {
 async function handleApi(req, res) {
   if (req.method === 'OPTIONS') {
     sendNoContent(res);
-    return;
-  }
-
-  if (!pgPool) {
-    sendJson(res, 503, { error: 'PostgreSQL is not configured on the server.' });
     return;
   }
 
@@ -187,7 +224,10 @@ async function handleApi(req, res) {
 }
 
 async function ensureDatabase() {
-  if (!pgPool) return;
+  if (!pgPool) {
+    await ensureFileStore();
+    return;
+  }
   await pgPool.query(`
     CREATE TABLE IF NOT EXISTS posts (
       id UUID PRIMARY KEY,
@@ -221,6 +261,11 @@ async function ensureDatabase() {
 }
 
 async function fetchPosts() {
+  if (!pgPool) {
+    const store = await readFileStore();
+    return [...store.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
   const { rows } = await pgPool.query(`
     SELECT id, format, title, theme, excerpt, read_time, created_at
     FROM posts
@@ -238,6 +283,13 @@ async function fetchPosts() {
 }
 
 async function createPost(post) {
+  if (!pgPool) {
+    const store = await readFileStore();
+    store.posts.unshift(post);
+    await writeFileStore(store);
+    return post;
+  }
+
   const { rows } = await pgPool.query(`
     INSERT INTO posts (id, format, title, theme, excerpt, read_time, created_at)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -259,10 +311,22 @@ async function createPost(post) {
 }
 
 async function clearPosts() {
+  if (!pgPool) {
+    const store = await readFileStore();
+    store.posts = [];
+    await writeFileStore(store);
+    return;
+  }
+
   await pgPool.query('DELETE FROM posts');
 }
 
 async function fetchSubscribers() {
+  if (!pgPool) {
+    const store = await readFileStore();
+    return [...store.subscribers].sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt));
+  }
+
   const { rows } = await pgPool.query(`
     SELECT email, subscribed_at
     FROM subscribers
@@ -275,6 +339,21 @@ async function fetchSubscribers() {
 }
 
 async function createSubscriber(email) {
+  if (!pgPool) {
+    const store = await readFileStore();
+    const existing = store.subscribers.find((subscriber) => subscriber.email === email);
+    if (existing) return null;
+
+    const subscriber = {
+      email,
+      subscribedAt: new Date().toISOString()
+    };
+
+    store.subscribers.unshift(subscriber);
+    await writeFileStore(store);
+    return subscriber;
+  }
+
   const id = typeof randomUUID === 'function'
     ? randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -292,11 +371,6 @@ async function createSubscriber(email) {
 async function handleSubscribersApi(req, res) {
   if (req.method === 'OPTIONS') {
     sendNoContent(res);
-    return;
-  }
-
-  if (!pgPool) {
-    sendJson(res, 503, { error: 'PostgreSQL is not configured on the server.' });
     return;
   }
 
@@ -360,15 +434,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, async () => {
-  if (pgPool) {
-    try {
-      await ensureDatabase();
+  try {
+    await ensureDatabase();
+    if (pgPool) {
       console.log('PostgreSQL tables are ready.');
-    } catch (error) {
-      console.error('Failed to initialize PostgreSQL tables:', error.message);
+    } else {
+      console.log(`File-backed store is ready at ${FILE_STORE_PATH}.`);
     }
-  } else {
-    console.warn('PostgreSQL not configured. API routes will return 503.');
+  } catch (error) {
+    console.error('Failed to initialize storage:', error.message);
   }
   console.log(`Server running at http://localhost:${PORT}`);
 });
