@@ -40,6 +40,21 @@ function sendNoContent(res) {
 
 function parseRequestBody(req) {
   if (req.body && typeof req.body === 'object') return Promise.resolve(req.body);
+  if (typeof req.body === 'string') {
+    try {
+      return Promise.resolve(req.body ? JSON.parse(req.body) : {});
+    } catch {
+      return Promise.reject(new Error('Invalid JSON body'));
+    }
+  }
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      const text = req.body.toString('utf8');
+      return Promise.resolve(text ? JSON.parse(text) : {});
+    } catch {
+      return Promise.reject(new Error('Invalid JSON body'));
+    }
+  }
 
   return new Promise((resolve, reject) => {
     let body = '';
