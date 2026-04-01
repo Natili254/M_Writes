@@ -2082,6 +2082,7 @@ Tryna navigate the real and fake</p>
   const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
   const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
   const ACCESS_ROLE_KEY = 'mw-access-role-v1';
+  const SUBSCRIBERS_CACHE_KEY = 'mw-subscribers-cache-v1';
   const VERIFIED_WRITER_EMAIL = 'imutashi2@gmail.com';
   const FEATURE_ROTATION_MS = 5500;
   let currentAccessRole = sessionStorage.getItem(ACCESS_ROLE_KEY) || '';
@@ -2126,9 +2127,26 @@ Tryna navigate the real and fake</p>
     }, 2800);
   };
 
+  const loadCachedSubscribers = () => {
+    try {
+      const cached = JSON.parse(localStorage.getItem(SUBSCRIBERS_CACHE_KEY) || '{}');
+      return cached && typeof cached === 'object' ? cached : { count: 0, subscribers: [] };
+    } catch {
+      return { count: 0, subscribers: [] };
+    }
+  };
+
+  const saveCachedSubscribers = (payload) => {
+    localStorage.setItem(SUBSCRIBERS_CACHE_KEY, JSON.stringify({
+      count: Number(payload?.count ?? (Array.isArray(payload?.subscribers) ? payload.subscribers.length : 0)),
+      subscribers: Array.isArray(payload?.subscribers) ? payload.subscribers : []
+    }));
+  };
+
   const renderSubscribers = (payload) => {
     const subscribers = Array.isArray(payload?.subscribers) ? payload.subscribers : [];
     subscriberCountEl.textContent = String(payload?.count ?? subscribers.length ?? 0);
+    saveCachedSubscribers({ count: payload?.count, subscribers });
     subscriberListEl.innerHTML = '';
     if (!subscribers.length) {
       const li = document.createElement('li');
@@ -3046,6 +3064,7 @@ Tryna navigate the real and fake</p>
   syncCardCategories();
   enhanceReaderCards();
   renderCategoryShowcase();
+  renderSubscribers(loadCachedSubscribers());
   authorReadTime.dataset.autoDefault = 'true';
   updateAuthorForm();
   applyAccessRole(currentAccessRole);
