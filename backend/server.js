@@ -144,10 +144,11 @@ async function readFileStore() {
     const parsed = JSON.parse(raw);
     return {
       posts: Array.isArray(parsed.posts) ? parsed.posts : [],
-      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : []
+      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : [],
+      newsletterDispatches: Array.isArray(parsed.newsletterDispatches) ? parsed.newsletterDispatches : []
     };
   } catch {
-    return { posts: [], subscribers: [] };
+    return { posts: [], subscribers: [], newsletterDispatches: [] };
   }
 }
 
@@ -155,7 +156,8 @@ async function writeFileStore(data) {
   await ensureFileStore();
   const payload = {
     posts: Array.isArray(data.posts) ? data.posts : [],
-    subscribers: Array.isArray(data.subscribers) ? data.subscribers : []
+    subscribers: Array.isArray(data.subscribers) ? data.subscribers : [],
+    newsletterDispatches: Array.isArray(data.newsletterDispatches) ? data.newsletterDispatches : []
   };
 
   await fsp.writeFile(FILE_STORE_PATH, JSON.stringify(payload, null, 2));
@@ -288,6 +290,27 @@ async function ensureDatabase() {
       ON subscribers (subscribed_at DESC)
     `);
 
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS newsletter_dispatches (
+        id UUID PRIMARY KEY,
+        month_key TEXT UNIQUE NOT NULL,
+        sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        mode TEXT NOT NULL DEFAULT 'manual',
+        subscriber_count INTEGER NOT NULL DEFAULT 0,
+        post_id UUID NOT NULL,
+        post_title TEXT NOT NULL,
+        post_theme TEXT NOT NULL,
+        post_format TEXT NOT NULL DEFAULT 'poem',
+        excerpt TEXT NOT NULL DEFAULT '',
+        subject TEXT NOT NULL
+      )
+    `);
+
+    await pgPool.query(`
+      CREATE INDEX IF NOT EXISTS newsletter_dispatches_sent_at_idx
+      ON newsletter_dispatches (sent_at DESC)
+    `);
+
     console.log('✓ PostgreSQL tables are ready');
   } catch (error) {
     console.error('✗ PostgreSQL connection failed:', error.message);
@@ -412,6 +435,206 @@ async function createSubscriber(email) {
   }
 }
 
+function toMonthKey(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+function buildDispatchSnapshot(post, subscriberCount, mode) {
+  const sentAt = new Date().toISOString();
+  return {
+    id: typeof randomUUID === 'function'
+      ? randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    monthKey: toMonthKey(new Date(sentAt)),
+    sentAt,
+    mode,
+    subscriberCount,
+    postId: post.id,
+    postTitle: post.title,
+    postTheme: post.theme,
+    postFormat: post.format || 'poem',
+    excerpt: post.excerpt,
+    subject: `Monthly poem: ${post.title}`
+  };
+}
+
+async function fetchLatestDispatch() {
+  if (!pgPool) {
+    const store = await readFileStore();
+    return [...store.newsletterDispatches]
+      .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))[0] || null;
+  }
+
+  const { rows } = await pgPool.query(`
+    SELECT id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
+    FROM newsletter_dispatches
+    ORDER BY sent_at DESC
+    LIMIT 1
+  `);
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    monthKey: row.month_key,
+    sentAt: row.sent_at,
+    mode: row.mode,
+    subscriberCount: row.subscriber_count,
+    postId: row.post_id,
+    postTitle: row.post_title,
+    postTheme: row.post_theme,
+    postFormat: row.post_format,
+    excerpt: row.excerpt,
+    subject: row.subject
+  };
+}
+
+async function createMonthlyDispatch(mode = 'manual') {
+  const monthKey = toMonthKey();
+  const subscribers = await fetchSubscribers();
+  const posts = await fetchPosts();
+  const featuredPost = posts.find((post) => post.format === 'poem') || posts[0];
+
+  if (!subscribers.length) {
+    return { created: false, reason: 'no-subscribers', dispatch: null };
+  }
+  if (!featuredPost) {
+    return { created: false, reason: 'no-posts', dispatch: null };
+  }
+
+  if (!pgPool) {
+    const store = await readFileStore();
+    const existing = store.newsletterDispatches.find((dispatch) => dispatch.monthKey === monthKey);
+    if (existing) return { created: false, reason: 'already-sent', dispatch: existing };
+
+    const dispatch = buildDispatchSnapshot(featuredPost, subscribers.length, mode);
+    store.newsletterDispatches.unshift(dispatch);
+    await writeFileStore(store);
+    return { created: true, reason: 'sent', dispatch };
+  }
+
+  const { rows: existingRows } = await pgPool.query(`
+    SELECT id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
+    FROM newsletter_dispatches
+    WHERE month_key = $1
+    LIMIT 1
+  `, [monthKey]);
+  if (existingRows[0]) {
+    const row = existingRows[0];
+    return {
+      created: false,
+      reason: 'already-sent',
+      dispatch: {
+        id: row.id,
+        monthKey: row.month_key,
+        sentAt: row.sent_at,
+        mode: row.mode,
+        subscriberCount: row.subscriber_count,
+        postId: row.post_id,
+        postTitle: row.post_title,
+        postTheme: row.post_theme,
+        postFormat: row.post_format,
+        excerpt: row.excerpt,
+        subject: row.subject
+      }
+    };
+  }
+
+  const dispatch = buildDispatchSnapshot(featuredPost, subscribers.length, mode);
+  const { rows } = await pgPool.query(`
+    INSERT INTO newsletter_dispatches (
+      id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    RETURNING id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
+  `, [
+    dispatch.id,
+    dispatch.monthKey,
+    dispatch.sentAt,
+    dispatch.mode,
+    dispatch.subscriberCount,
+    dispatch.postId,
+    dispatch.postTitle,
+    dispatch.postTheme,
+    dispatch.postFormat,
+    dispatch.excerpt,
+    dispatch.subject
+  ]);
+  const row = rows[0];
+  return {
+    created: true,
+    reason: 'sent',
+    dispatch: {
+      id: row.id,
+      monthKey: row.month_key,
+      sentAt: row.sent_at,
+      mode: row.mode,
+      subscriberCount: row.subscriber_count,
+      postId: row.post_id,
+      postTitle: row.post_title,
+      postTheme: row.post_theme,
+      postFormat: row.post_format,
+      excerpt: row.excerpt,
+      subject: row.subject
+    }
+  };
+}
+
+async function getDispatchStatus() {
+  const latestDispatch = await fetchLatestDispatch();
+  const subscribers = await fetchSubscribers();
+  const posts = await fetchPosts();
+  const currentMonth = toMonthKey();
+  const sentThisMonth = latestDispatch?.monthKey === currentMonth;
+  return {
+    currentMonth,
+    sentThisMonth,
+    subscriberCount: subscribers.length,
+    postCount: posts.length,
+    latestDispatch
+  };
+}
+
+async function handleNewsletterDispatchApi(req, res) {
+  if (req.method === 'OPTIONS') {
+    sendNoContent(res);
+    return;
+  }
+
+  if (req.method === 'GET') {
+    try {
+      const status = await getDispatchStatus();
+      sendJson(res, 200, status);
+    } catch (error) {
+      console.error('GET /api/newsletter/dispatch error:', error);
+      sendJson(res, 500, { error: error.message || 'Failed to load newsletter dispatch status.' });
+    }
+    return;
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const payload = await parseRequestBody(req);
+      const mode = payload?.mode === 'auto' ? 'auto' : 'manual';
+      const result = await createMonthlyDispatch(mode);
+      const status = await getDispatchStatus();
+      sendJson(res, 200, {
+        ...status,
+        created: result.created,
+        reason: result.reason,
+        latestDispatch: result.dispatch || status.latestDispatch
+      });
+    } catch (error) {
+      console.error('POST /api/newsletter/dispatch error:', error);
+      sendJson(res, 500, { error: error.message || 'Failed to create newsletter dispatch.' });
+    }
+    return;
+  }
+
+  sendJson(res, 405, { error: 'Method not allowed' });
+}
+
 async function handleSubscribersApi(req, res) {
   if (req.method === 'OPTIONS') {
     console.log('OPTIONS request to /api/subscribers');
@@ -480,6 +703,11 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/subscribers') {
     await handleSubscribersApi(req, res);
+    return;
+  }
+
+  if (pathname === '/api/newsletter/dispatch') {
+    await handleNewsletterDispatchApi(req, res);
     return;
   }
 

@@ -595,6 +595,17 @@
     font-size: .76rem;
     color: var(--sage);
   }
+  .dispatch-panel {
+    border-top: 1px solid var(--dust);
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+  }
+  .dispatch-status {
+    font-size: .8rem;
+    line-height: 1.7;
+    color: #4a3f35;
+    margin-bottom: .9rem;
+  }
   .poem-card.user-post {
     border-left: 3px solid var(--gold);
   }
@@ -1826,6 +1837,13 @@
       </ul>
       <p class="subscriber-status" id="subscriber-status"></p>
     </div>
+    <div class="dispatch-panel">
+      <div class="subscriber-head">
+        <p class="subscriber-count">Monthly Dispatch</p>
+        <button class="btn-ghost" type="button" id="send-monthly-dispatch">Send This Month's Poem</button>
+      </div>
+      <p class="dispatch-status" id="dispatch-status">Monthly dispatch status will appear here.</p>
+    </div>
   </div>
 
   <div class="filter-bar fade-up">
@@ -2016,6 +2034,7 @@ Tryna navigate the real and fake</p>
       ? 'http://localhost:3000'
       : 'https://m-writes.onrender.com');
   const POSTS_API_URL = `${API_BASE_URL}/api/posts`;
+  const NEWSLETTER_DISPATCH_API_URL = `${API_BASE_URL}/api/newsletter/dispatch`;
 
   const poemsGrid = document.querySelector('.poems-grid');
   const navElement = document.querySelector('nav');
@@ -2049,6 +2068,8 @@ Tryna navigate the real and fake</p>
   const subscriberCountEl = document.getElementById('subscriber-count');
   const subscriberListEl = document.getElementById('subscriber-list');
   const subscriberStatusEl = document.getElementById('subscriber-status');
+  const sendMonthlyDispatchBtn = document.getElementById('send-monthly-dispatch');
+  const dispatchStatusEl = document.getElementById('dispatch-status');
   const backendMode = document.getElementById('backend-mode');
   const accessGate = document.getElementById('access-gate');
   const readerAccessBtn = document.getElementById('reader-access-btn');
@@ -2083,6 +2104,7 @@ Tryna navigate the real and fake</p>
   const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
   const ACCESS_ROLE_KEY = 'mw-access-role-v1';
   const SUBSCRIBERS_CACHE_KEY = 'mw-subscribers-cache-v1';
+  const DISPATCH_STATUS_CACHE_KEY = 'mw-dispatch-status-cache-v1';
   const VERIFIED_WRITER_EMAIL = 'imutashi2@gmail.com';
   const FEATURE_ROTATION_MS = 5500;
   let currentAccessRole = sessionStorage.getItem(ACCESS_ROLE_KEY) || '';
@@ -2143,6 +2165,19 @@ Tryna navigate the real and fake</p>
     }));
   };
 
+  const loadCachedDispatchStatus = () => {
+    try {
+      const cached = JSON.parse(localStorage.getItem(DISPATCH_STATUS_CACHE_KEY) || 'null');
+      return cached && typeof cached === 'object' ? cached : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveCachedDispatchStatus = (payload) => {
+    localStorage.setItem(DISPATCH_STATUS_CACHE_KEY, JSON.stringify(payload));
+  };
+
   const renderSubscribers = (payload) => {
     const subscribers = Array.isArray(payload?.subscribers) ? payload.subscribers : [];
     subscriberCountEl.textContent = String(payload?.count ?? subscribers.length ?? 0);
@@ -2199,6 +2234,86 @@ Tryna navigate the real and fake</p>
       setSubscriberStatus('Subscribers updated.');
     } catch (error) {
       setSubscriberStatus(error.message || 'Could not load subscribers.');
+    }
+  };
+
+  const renderDispatchStatus = (payload) => {
+    if (!dispatchStatusEl) return;
+    if (payload) saveCachedDispatchStatus(payload);
+    const latest = payload?.latestDispatch;
+    if (!latest) {
+      dispatchStatusEl.textContent = 'No monthly poem has been dispatched yet.';
+      return;
+    }
+    const sentMonth = latest.monthKey || 'this month';
+    dispatchStatusEl.textContent = `${sentMonth} dispatch sent for "${latest.postTitle}" to ${latest.subscriberCount} subscriber${latest.subscriberCount === 1 ? '' : 's'} on ${formatDateTime(latest.sentAt)}.`;
+  };
+
+  const fetchDispatchStatus = async () => {
+    const response = await fetch(NEWSLETTER_DISPATCH_API_URL, { method: 'GET' });
+    if (!response.ok) {
+      if (response.status === 404 || response.status === 405) return null;
+      throw new Error('Unable to load monthly dispatch status.');
+    }
+    return response.json();
+  };
+
+  const createMonthlyDispatch = async (mode = 'manual') => {
+    const response = await fetch(NEWSLETTER_DISPATCH_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode })
+    });
+    if (!response.ok) {
+      let message = 'Monthly dispatch failed.';
+      try {
+        const body = await response.json();
+        if (body?.error) message = body.error;
+      } catch {
+        // keep default message
+      }
+      throw new Error(message);
+    }
+    return response.json();
+  };
+
+  const refreshDispatchStatus = async () => {
+    try {
+      const data = await fetchDispatchStatus();
+      if (!data) {
+        const cached = loadCachedDispatchStatus();
+        if (cached) {
+          renderDispatchStatus(cached);
+        } else {
+          dispatchStatusEl.textContent = 'Monthly dispatch will appear once the backend syncs this feature.';
+        }
+        return null;
+      }
+      renderDispatchStatus(data);
+      return data;
+    } catch (error) {
+      const cached = loadCachedDispatchStatus();
+      if (cached) {
+        renderDispatchStatus(cached);
+      } else {
+        dispatchStatusEl.textContent = 'Monthly dispatch will appear once the backend syncs this feature.';
+      }
+      return null;
+    }
+  };
+
+  const ensureMonthlyDispatchIfDue = async () => {
+    if (currentAccessRole !== 'writer') return;
+    const status = await refreshDispatchStatus();
+    if (!status || status.sentThisMonth || !status.subscriberCount || !status.postCount) return;
+    try {
+      const result = await createMonthlyDispatch('auto');
+      renderDispatchStatus(result);
+      if (result.created) {
+        setSubscriberStatus('Monthly poem dispatch completed automatically.');
+      }
+    } catch (error) {
+      dispatchStatusEl.textContent = error.message || 'Automatic monthly dispatch failed.';
     }
   };
 
@@ -3020,6 +3135,7 @@ Tryna navigate the real and fake</p>
       authorReadTime.dataset.autoDefault = 'true';
       updateAuthorForm();
       await renderSavedPosts();
+      await refreshDispatchStatus();
       setStatus('Published.');
     } catch (error) {
       setStatus(error.message || 'Publish failed.');
@@ -3040,6 +3156,29 @@ Tryna navigate the real and fake</p>
     await refreshSubscribers();
   });
 
+  sendMonthlyDispatchBtn.addEventListener('click', async () => {
+    try {
+      sendMonthlyDispatchBtn.disabled = true;
+      sendMonthlyDispatchBtn.textContent = 'Sending...';
+      const result = await createMonthlyDispatch('manual');
+      renderDispatchStatus(result);
+      if (result.created) {
+        setStatus('Monthly poem dispatched.');
+      } else if (result.reason === 'already-sent') {
+        setStatus('This month has already been dispatched.');
+      } else if (result.reason === 'no-subscribers') {
+        setStatus('No subscribers available yet.');
+      } else if (result.reason === 'no-posts') {
+        setStatus('Publish a poem before dispatching.');
+      }
+    } catch (error) {
+      setStatus(error.message || 'Monthly dispatch failed.');
+    } finally {
+      sendMonthlyDispatchBtn.disabled = false;
+      sendMonthlyDispatchBtn.textContent = 'Send This Month\'s Poem';
+    }
+  });
+
   newsletterForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = newsletterEmail.value.trim().toLowerCase();
@@ -3052,6 +3191,7 @@ Tryna navigate the real and fake</p>
       const data = await createSubscriber(email);
       renderSubscribers(data);
       newsletterForm.reset();
+      await refreshDispatchStatus();
       setSubscriberStatus(data.created ? 'Subscriber added.' : 'Subscriber already exists.');
     } catch (error) {
       setSubscriberStatus(error.message || 'Subscription failed.');
@@ -3073,6 +3213,7 @@ Tryna navigate the real and fake</p>
   startFeaturedRotation();
   renderSavedPosts();
   refreshSubscribers();
+  ensureMonthlyDispatchIfDue();
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
