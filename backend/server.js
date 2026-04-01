@@ -11,10 +11,19 @@ const BACKEND_DIR = __dirname;
 const FRONTEND_DIR = path.resolve(BACKEND_DIR, '..', 'frontend');
 const FILE_STORE_PATH = path.join(BACKEND_DIR, 'data', 'content.json');
 const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
-const pgPool = hasPostgresConfig ? new Pool({
-  connectionString: process.env.DATABASE_URL || undefined,
-  ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined
-}) : null;
+
+let pgPool = null;
+if (hasPostgresConfig) {
+  pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL || undefined,
+    ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined
+  });
+  
+  // Add error listener to pool
+  pgPool.on('error', (err) => {
+    console.error('PostgreSQL pool error:', err);
+  });
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -49,7 +58,10 @@ function sendNoContent(res) {
 }
 
 function sendText(res, statusCode, message) {
-  res.writeHead(statusCode, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.writeHead(statusCode, { 
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Access-Control-Allow-Origin': '*'
+  });
   res.end(message);
 }
 
@@ -89,6 +101,7 @@ function normalizePost(input) {
   const title = String(input.title || '').trim();
   const theme = String(input.theme || '').trim();
   const excerpt = String(input.excerpt || '').trim();
+  const body = String(input.body || input.excerpt || '').trim();
   const readTime = String(input.readTime || '2 min read').trim();
   const parsedCreatedAt = input.createdAt ? new Date(input.createdAt) : new Date();
 
@@ -98,8 +111,8 @@ function normalizePost(input) {
 
   const createdAt = parsedCreatedAt.toISOString();
 
-  if (!title || !theme || !excerpt) {
-    return { error: 'title, theme, and excerpt are required' };
+  if (!title || !theme || !excerpt || !body) {
+    return { error: 'title, theme, excerpt, and body are required' };
   }
 
   return {
@@ -108,6 +121,7 @@ function normalizePost(input) {
     title,
     theme,
     excerpt,
+    body,
     readTime,
     createdAt
   };
@@ -181,6 +195,7 @@ async function handleApi(req, res) {
       const posts = await fetchPosts();
       sendJson(res, 200, posts);
     } catch (error) {
+      console.error('GET /api/posts error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to load posts.' });
     }
     return;
@@ -202,6 +217,7 @@ async function handleApi(req, res) {
       }
       sendJson(res, 201, post);
     } catch (error) {
+      console.error('POST /api/posts error:', error);
       const statusCode = error.message === 'Invalid JSON body' || error.message === 'Payload too large'
         ? 400
         : 500;
@@ -215,6 +231,7 @@ async function handleApi(req, res) {
       await clearPosts();
       sendNoContent(res);
     } catch (error) {
+      console.error('DELETE /api/posts error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to clear posts.' });
     }
     return;
@@ -225,39 +242,59 @@ async function handleApi(req, res) {
 
 async function ensureDatabase() {
   if (!pgPool) {
+    console.log('Using file-based storage');
     await ensureFileStore();
     return;
   }
-  await pgPool.query(`
-    CREATE TABLE IF NOT EXISTS posts (
-      id UUID PRIMARY KEY,
-      format TEXT NOT NULL DEFAULT 'poem',
-      title TEXT NOT NULL,
-      theme TEXT NOT NULL,
-      excerpt TEXT NOT NULL,
-      read_time TEXT NOT NULL DEFAULT '2 min read',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-  await pgPool.query(`
-    ALTER TABLE posts
-    ADD COLUMN IF NOT EXISTS format TEXT NOT NULL DEFAULT 'poem'
-  `);
-  await pgPool.query(`
-    CREATE INDEX IF NOT EXISTS posts_created_at_idx
-    ON posts (created_at DESC)
-  `);
-  await pgPool.query(`
-    CREATE TABLE IF NOT EXISTS subscribers (
-      id UUID PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-  await pgPool.query(`
-    CREATE INDEX IF NOT EXISTS subscribers_subscribed_at_idx
-    ON subscribers (subscribed_at DESC)
-  `);
+
+  try {
+    // Test the connection
+    const result = await pgPool.query('SELECT NOW()');
+    console.log('✓ PostgreSQL connection successful');
+
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id UUID PRIMARY KEY,
+        format TEXT NOT NULL DEFAULT 'poem',
+        title TEXT NOT NULL,
+        theme TEXT NOT NULL,
+        excerpt TEXT NOT NULL,
+        body TEXT NOT NULL DEFAULT '',
+        read_time TEXT NOT NULL DEFAULT '2 min read',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    await pgPool.query(`
+      ALTER TABLE posts
+      ADD COLUMN IF NOT EXISTS body TEXT NOT NULL DEFAULT ''
+    `);
+
+    await pgPool.query(`
+      CREATE INDEX IF NOT EXISTS posts_created_at_idx
+      ON posts (created_at DESC)
+    `);
+
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS subscribers (
+        id UUID PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    await pgPool.query(`
+      CREATE INDEX IF NOT EXISTS subscribers_subscribed_at_idx
+      ON subscribers (subscribed_at DESC)
+    `);
+
+    console.log('✓ PostgreSQL tables are ready');
+  } catch (error) {
+    console.error('✗ PostgreSQL connection failed:', error.message);
+    console.error('Falling back to file-based storage');
+    pgPool = null;
+    await ensureFileStore();
+  }
 }
 
 async function fetchPosts() {
@@ -267,7 +304,7 @@ async function fetchPosts() {
   }
 
   const { rows } = await pgPool.query(`
-    SELECT id, format, title, theme, excerpt, read_time, created_at
+    SELECT id, format, title, theme, excerpt, body, read_time, created_at
     FROM posts
     ORDER BY created_at DESC
   `);
@@ -277,6 +314,7 @@ async function fetchPosts() {
     title: row.title,
     theme: row.theme,
     excerpt: row.excerpt,
+    body: row.body || row.excerpt,
     readTime: row.read_time,
     createdAt: row.created_at
   }));
@@ -291,10 +329,10 @@ async function createPost(post) {
   }
 
   const { rows } = await pgPool.query(`
-    INSERT INTO posts (id, format, title, theme, excerpt, read_time, created_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id, format, title, theme, excerpt, read_time, created_at
-  `, [post.id, post.format, post.title, post.theme, post.excerpt, post.readTime, post.createdAt]);
+    INSERT INTO posts (id, format, title, theme, excerpt, body, read_time, created_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING id, format, title, theme, excerpt, body, read_time, created_at
+  `, [post.id, post.format, post.title, post.theme, post.excerpt, post.body, post.readTime, post.createdAt]);
 
   const row = rows[0];
   if (!row) return null;
@@ -305,6 +343,7 @@ async function createPost(post) {
     title: row.title,
     theme: row.theme,
     excerpt: row.excerpt,
+    body: row.body || row.excerpt,
     readTime: row.read_time,
     createdAt: row.created_at
   };
@@ -358,23 +397,30 @@ async function createSubscriber(email) {
     ? randomUUID()
     : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
-  const { rows } = await pgPool.query(`
-    INSERT INTO subscribers (id, email)
-    VALUES ($1, $2)
-    ON CONFLICT (email) DO NOTHING
-    RETURNING email, subscribed_at
-  `, [id, email]);
+  try {
+    const { rows } = await pgPool.query(`
+      INSERT INTO subscribers (id, email)
+      VALUES ($1, $2)
+      ON CONFLICT (email) DO NOTHING
+      RETURNING email, subscribed_at
+    `, [id, email]);
 
-  return rows[0] || null;
+    return rows[0] || null;
+  } catch (error) {
+    console.error('Database error in createSubscriber:', error);
+    throw error;
+  }
 }
 
 async function handleSubscribersApi(req, res) {
   if (req.method === 'OPTIONS') {
+    console.log('OPTIONS request to /api/subscribers');
     sendNoContent(res);
     return;
   }
 
   if (req.method === 'GET') {
+    console.log('GET /api/subscribers');
     try {
       const subscribers = await fetchSubscribers();
       sendJson(res, 200, {
@@ -382,28 +428,37 @@ async function handleSubscribersApi(req, res) {
         subscribers
       });
     } catch (error) {
+      console.error('GET /api/subscribers error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to load subscribers.' });
     }
     return;
   }
 
   if (req.method === 'POST') {
+    console.log('POST /api/subscribers');
     try {
       const payload = await parseRequestBody(req);
+      console.log('Request payload:', payload);
+      
       const email = normalizeEmail(payload.email);
       if (!email) {
+        console.log('Invalid email provided:', payload.email);
         sendJson(res, 400, { error: 'A valid email is required.' });
         return;
       }
 
+      console.log('Creating subscriber for:', email);
       const created = await createSubscriber(email);
       const subscribers = await fetchSubscribers();
+      
+      console.log('Subscriber created:', created !== null, 'Total subscribers:', subscribers.length);
       sendJson(res, 201, {
         created: Boolean(created),
         count: subscribers.length,
         subscribers
       });
     } catch (error) {
+      console.error('POST /api/subscribers error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to save subscriber.' });
     }
     return;
@@ -415,6 +470,8 @@ async function handleSubscribersApi(req, res) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname;
+
+  console.log(`${req.method} ${pathname}`);
 
   if (pathname === '/api/posts') {
     await handleApi(req, res);
@@ -436,13 +493,8 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, async () => {
   try {
     await ensureDatabase();
-    if (pgPool) {
-      console.log('PostgreSQL tables are ready.');
-    } else {
-      console.log(`File-backed store is ready at ${FILE_STORE_PATH}.`);
-    }
   } catch (error) {
-    console.error('Failed to initialize storage:', error.message);
+    console.error('✗ Failed to initialize storage:', error.message);
   }
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`\n🚀 Server running at http://localhost:${PORT}\n`);
 });

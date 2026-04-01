@@ -196,6 +196,104 @@
   .writer-entry:hover {
     background: rgba(159, 124, 70, 0.96);
   }
+  .writer-entry.is-hidden {
+    display: none;
+  }
+  .access-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 220;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(18, 14, 10, 0.72);
+    backdrop-filter: blur(10px);
+  }
+  .access-gate.is-hidden {
+    display: none;
+  }
+  .access-card {
+    width: min(560px, 100%);
+    padding: 2rem;
+    background: linear-gradient(180deg, rgba(239, 227, 210, 0.98) 0%, rgba(232, 220, 199, 0.98) 100%);
+    border: 1px solid rgba(159, 124, 70, 0.32);
+    box-shadow: 0 28px 60px rgba(15, 11, 8, 0.24);
+  }
+  .access-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 2.7rem);
+    font-weight: 400;
+    margin-bottom: .65rem;
+  }
+  .access-sub {
+    font-size: .9rem;
+    line-height: 1.8;
+    color: #463a31;
+    margin-bottom: 1.5rem;
+  }
+  .access-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .85rem;
+    margin-bottom: 1rem;
+  }
+  .access-secondary {
+    border: 1px solid var(--dust);
+    background: transparent;
+    color: var(--ink);
+    padding: .9rem 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    font-size: .68rem;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+  }
+  .access-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .writer-access-form {
+    display: none;
+    margin-top: 1.25rem;
+    border-top: 1px solid rgba(159, 124, 70, 0.22);
+    padding-top: 1.25rem;
+  }
+  .writer-access-form.is-visible {
+    display: block;
+  }
+  .writer-access-form label {
+    display: block;
+    margin-bottom: .45rem;
+    font-size: .65rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #5a4d41;
+  }
+  .writer-access-form input {
+    width: 100%;
+    border: 1px solid #bea37c;
+    background: #fbf4eb;
+    padding: .85rem .9rem;
+    font: inherit;
+    color: var(--ink);
+  }
+  .writer-access-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    align-items: center;
+    margin-top: .85rem;
+  }
+  .writer-access-note,
+  .writer-access-status {
+    font-size: .78rem;
+    color: #5a4d41;
+  }
+  .writer-access-status {
+    min-height: 1.2em;
+    color: var(--rose);
+  }
 
   /* HERO */
   #home {
@@ -319,6 +417,7 @@
     padding-left: 1rem;
     font-style: italic;
     text-shadow: 0 1px 12px rgba(10, 8, 6, 0.38);
+    white-space: pre-line;
   }
   .poem-read-more {
     display: inline-block;
@@ -446,6 +545,7 @@
   .author-form-actions {
     display: flex;
     gap: .7rem;
+    flex-wrap: wrap;
     align-items: center;
     margin-top: .3rem;
   }
@@ -498,12 +598,221 @@
   .poem-card.user-post {
     border-left: 3px solid var(--gold);
   }
+  .category-showcase {
+    margin: 0 0 2.4rem;
+  }
+  .category-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+  .category-showcase-card {
+    background: rgba(244, 234, 220, 0.86);
+    border: 1px solid rgba(190, 163, 124, 0.5);
+    padding: 1.3rem;
+  }
+  .category-showcase-card .btn-ghost {
+    width: 100%;
+    justify-content: center;
+    padding: .95rem 1.1rem;
+    border: 1px solid var(--gold);
+    background: linear-gradient(135deg, rgba(159, 124, 70, 0.18), rgba(159, 95, 82, 0.08));
+    color: var(--ink);
+    font-size: .68rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    box-shadow: 0 10px 24px rgba(159, 124, 70, 0.14);
+  }
+  .category-showcase-card .btn-ghost:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--paper);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px rgba(159, 124, 70, 0.24);
+  }
+  .category-showcase-label {
+    font-size: .62rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .7rem;
+  }
+  .category-showcase-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 400;
+    margin-bottom: .8rem;
+  }
+  .category-showcase-list {
+    display: grid;
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .category-showcase-item {
+    border-top: 1px solid rgba(190, 163, 124, 0.42);
+    padding-top: .75rem;
+  }
+  .category-showcase-item:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .category-showcase-item strong {
+    display: block;
+    font-size: .95rem;
+    color: #43382f;
+    margin-bottom: .25rem;
+  }
+  .category-showcase-item span {
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6b5645;
+  }
+  .poems-grid-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 0 1.2rem;
+  }
+  .poems-grid-status {
+    font-size: .74rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #5a4d41;
+  }
+  .poems-grid-actions {
+    display: flex;
+    gap: .8rem;
+    flex-wrap: wrap;
+  }
+  .reading-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 260;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(18, 14, 10, 0.76);
+    backdrop-filter: blur(10px);
+  }
+  .reading-modal.is-open {
+    display: flex;
+  }
+  .reading-modal-card {
+    width: min(900px, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f4eadc 0%, #eadbc6 100%);
+    border: 1px solid rgba(190, 163, 124, 0.55);
+    box-shadow: 0 28px 60px rgba(15, 11, 8, 0.28);
+    padding: 1.5rem;
+  }
+  .reading-modal-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.2rem;
+  }
+  .reading-modal-kicker {
+    font-size: .64rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .45rem;
+  }
+  .reading-modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 400;
+  }
+  .reading-modal-close {
+    border: 1px solid rgba(190, 163, 124, 0.8);
+    background: transparent;
+    color: var(--ink);
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.1rem;
+  }
+  .reading-modal-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    gap: 1.2rem;
+  }
+  .reading-modal-list {
+    border-right: 1px solid rgba(190, 163, 124, 0.42);
+    padding-right: 1rem;
+    display: grid;
+    gap: .75rem;
+    align-content: start;
+  }
+  .reading-modal-item {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(190, 163, 124, 0.45);
+    background: rgba(251, 244, 235, 0.76);
+    padding: .9rem;
+    cursor: pointer;
+    color: var(--ink);
+    font: inherit;
+  }
+  .reading-modal-item.is-active {
+    border-color: var(--gold);
+    background: rgba(209, 184, 127, 0.18);
+  }
+  .reading-modal-item strong {
+    display: block;
+    margin-bottom: .3rem;
+    font-size: .95rem;
+  }
+  .reading-modal-item span {
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6b5645;
+  }
+  .reading-modal-body {
+    min-width: 0;
+  }
+  .reading-modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-bottom: 1rem;
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #6b5645;
+  }
+  .reading-modal-content {
+    font-size: .95rem;
+    line-height: 1.95;
+    color: #43382f;
+    white-space: pre-line;
+  }
+  .reading-modal-empty {
+    color: #6b5645;
+    font-size: .85rem;
+  }
   @media (max-width: 960px) {
     .poems-grid { grid-template-columns: repeat(2, 1fr); }
     .author-form { grid-template-columns: 1fr; }
+    .category-showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .reading-modal-grid { grid-template-columns: 1fr; }
+    .reading-modal-list {
+      border-right: 0;
+      border-bottom: 1px solid rgba(190, 163, 124, 0.42);
+      padding-right: 0;
+      padding-bottom: 1rem;
+    }
   }
   @media (max-width: 640px) {
     .poems-grid { grid-template-columns: 1fr; }
+    .category-showcase-grid { grid-template-columns: 1fr; }
   }
   .poem-card {
     background: #f4eadc;
@@ -1375,7 +1684,7 @@
 </head>
 <body>
 
-<a class="writer-entry" href="#author-studio" id="writer-entry">Write a poem</a>
+<a class="writer-entry is-hidden" href="#author-studio" id="writer-entry">Write a poem</a>
 
 <!-- NAVIGATION -->
 <nav>
@@ -1421,23 +1730,45 @@
     </p>
     <div class="hero-actions">
       <a href="#poems" class="btn-primary">Read the Poems</a>
+      <button class="access-secondary" type="button" id="writer-access-trigger">Verified Writer</button>
     </div>
   </div>
   <div class="hero-right">
     <div class="hero-texture"></div>
     <div class="hero-poem-card">
-      <p class="poem-label">&#10022; Featured Lines</p>
-      <h2 class="poem-title">Nabayet - Otile Brown</h2>
-      <div class="poem-lines">
+      <p class="poem-label" id="featured-label">&#10022; Featured Lines</p>
+      <h2 class="poem-title" id="featured-title">Nabayet - Otile Brown</h2>
+      <div class="poem-lines" id="featured-lines">
         Nimejaliwa moyo wa upendo<br>
         Nikipenda napendaga vibaya<br>
         Ila scandal zimefanya sija settle<br>
         Sina hamu nazo kisa wewe mama<br>
       </div>
-      <a href="#poems" class="poem-read-more">Read full poem &rarr;</a>
+      <a href="#poems" class="poem-read-more" id="featured-read-more">Read full poem &rarr;</a>
     </div>
   </div>
 </section>
+
+<div class="access-gate" id="access-gate" aria-hidden="false">
+  <div class="access-card">
+    <p class="section-label">&#10022; Welcome</p>
+    <h2 class="access-title">Choose how you want to enter</h2>
+    <p class="access-sub">Readers go straight to the poems with no sign up. Writer access is reserved for the verified author email.</p>
+    <div class="access-actions">
+      <button class="btn-primary" type="button" id="reader-access-btn">Enter as Reader</button>
+      <button class="access-secondary" type="button" id="writer-access-btn">I am the Writer</button>
+    </div>
+    <form class="writer-access-form" id="writer-access-form">
+      <label for="writer-email">Verified writer email</label>
+      <input type="email" id="writer-email" placeholder="imutashi2@gmail.com" autocomplete="email" required>
+      <div class="writer-access-actions">
+        <button class="btn-primary" type="submit">Unlock Writer Studio</button>
+        <span class="writer-access-note">Only `imutashi2@gmail.com` can publish poems.</span>
+      </div>
+      <p class="writer-access-status" id="writer-access-status"></p>
+    </form>
+  </div>
+</div>
 
 <!-- POEMS -->
 <section id="poems">
@@ -1476,9 +1807,11 @@
         <option>Growth</option>
       </select>
       <textarea class="full" id="author-excerpt" placeholder="Write a short excerpt..." required></textarea>
+      <textarea class="full" id="author-body" placeholder="Write the full poem or article..." required></textarea>
       <input type="text" id="author-read-time" placeholder="Read time (e.g. 2 min read)" value="2 min read" required>
       <div class="author-form-actions full">
         <button class="btn-primary" type="submit" id="publish-button">Publish Poem</button>
+        <button class="btn-ghost" type="button" id="preview-reader-view">Preview Reader View</button>
         <button class="btn-ghost" type="button" id="clear-posts">Clear Saved Posts</button>
         <span class="author-status" id="author-status"></span>
       </div>
@@ -1503,6 +1836,23 @@
     <button class="filter-btn" data-theme="spiritual">Spiritual</button>
     <button class="filter-btn" data-theme="loss">Loss</button>
     <button class="filter-btn" data-theme="growth">Growth</button>
+  </div>
+
+  <div class="category-showcase fade-up" id="category-showcase">
+    <div class="poems-grid-toolbar">
+      <p class="poems-grid-status">A few recent pieces from each category.</p>
+      <div class="poems-grid-actions">
+        <button class="btn-ghost" type="button" id="show-all-poems">Show all writing</button>
+      </div>
+    </div>
+    <div class="category-showcase-grid" id="category-showcase-grid"></div>
+  </div>
+
+  <div class="poems-grid-toolbar fade-up">
+    <p class="poems-grid-status" id="poems-grid-status">Showing all themes and all formats.</p>
+    <div class="poems-grid-actions">
+      <button class="btn-ghost" type="button" id="reset-poem-filters">Reset filters</button>
+    </div>
   </div>
 
   <div class="poems-grid fade-up">
@@ -1563,6 +1913,25 @@ Tryna navigate the real and fake</p>
     </a>
   </div>
 </section>
+
+<div class="reading-modal" id="reading-modal" aria-hidden="true">
+  <div class="reading-modal-card">
+    <div class="reading-modal-head">
+      <div>
+        <p class="reading-modal-kicker" id="reading-modal-kicker">Category</p>
+        <h2 class="reading-modal-title" id="reading-modal-title">Explore Poems</h2>
+      </div>
+      <button class="reading-modal-close" type="button" id="reading-modal-close" aria-label="Close reading view">×</button>
+    </div>
+    <div class="reading-modal-grid">
+      <div class="reading-modal-list" id="reading-modal-list"></div>
+      <div class="reading-modal-body">
+        <div class="reading-modal-meta" id="reading-modal-meta"></div>
+        <div class="reading-modal-content" id="reading-modal-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- ABOUT -->
 <section id="about">
   <div class="fade-up">
@@ -1617,17 +1986,17 @@ Tryna navigate the real and fake</p>
       <div class="contact-item"><div class="contact-icon">&#128205;</div><p>Nairobi, Kenya</p></div>
     </div>
     <div class="socials">
-      <a class="social-link" href="#" aria-label="Facebook">
+      <a class="social-link" href="" aria-label="Facebook">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M13.5 21v-8.2h2.7l.4-3h-3.1V7.9c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.2v2.1H7.5v3h2.7V21h3.3Z"/>
         </svg>
       </a>
-      <a class="social-link" href="#" aria-label="Twitter">
+      <a class="social-link" href="https://x.com/Mutashi_MLO" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M18.9 2H22l-6.77 7.74L23 22h-6.1l-4.78-6.28L6.63 22H3.5l7.25-8.29L1 2h6.25l4.32 5.7L18.9 2Zm-1.07 18h1.69L6.33 3.9H4.5L17.83 20Z"/>
         </svg>
       </a>
-      <a class="social-link" href="#" aria-label="Instagram">
+      <a class="social-link" href="https://www.instagram.com/thealpha261?igsh=MTVzNzZremxrenEzZQ==" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm11.5 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
         </svg>
@@ -1654,6 +2023,7 @@ Tryna navigate the real and fake</p>
   const navScrim = document.querySelector('.nav-scrim');
   const navLinksContainer = document.querySelector('.nav-links');
   const writerEntry = document.getElementById('writer-entry');
+  const writerAccessTrigger = document.getElementById('writer-access-trigger');
   const aboutAuthorImage = document.querySelector('.about-author-image');
   const navFormatLinks = document.querySelectorAll('[data-nav-format]');
   const formatButtons = document.querySelectorAll('.format-btn');
@@ -1664,8 +2034,10 @@ Tryna navigate the real and fake</p>
   const authorFormat = document.getElementById('author-format');
   const authorTitle = document.getElementById('author-title');
   const authorExcerpt = document.getElementById('author-excerpt');
+  const authorBody = document.getElementById('author-body');
   const authorReadTime = document.getElementById('author-read-time');
   const publishButton = document.getElementById('publish-button');
+  const previewReaderViewBtn = document.getElementById('preview-reader-view');
   const authorTypeNote = document.getElementById('author-type-note');
   const clearPostsBtn = document.getElementById('clear-posts');
   const authorStatus = document.getElementById('author-status');
@@ -1678,6 +2050,27 @@ Tryna navigate the real and fake</p>
   const subscriberListEl = document.getElementById('subscriber-list');
   const subscriberStatusEl = document.getElementById('subscriber-status');
   const backendMode = document.getElementById('backend-mode');
+  const accessGate = document.getElementById('access-gate');
+  const readerAccessBtn = document.getElementById('reader-access-btn');
+  const writerAccessBtn = document.getElementById('writer-access-btn');
+  const writerAccessForm = document.getElementById('writer-access-form');
+  const writerEmailInput = document.getElementById('writer-email');
+  const writerAccessStatus = document.getElementById('writer-access-status');
+  const categoryShowcaseGrid = document.getElementById('category-showcase-grid');
+  const resetPoemFiltersBtn = document.getElementById('reset-poem-filters');
+  const showAllPoemsBtn = document.getElementById('show-all-poems');
+  const poemsGridStatus = document.getElementById('poems-grid-status');
+  const featuredLabel = document.getElementById('featured-label');
+  const featuredTitle = document.getElementById('featured-title');
+  const featuredLines = document.getElementById('featured-lines');
+  const featuredReadMore = document.getElementById('featured-read-more');
+  const readingModal = document.getElementById('reading-modal');
+  const readingModalClose = document.getElementById('reading-modal-close');
+  const readingModalKicker = document.getElementById('reading-modal-kicker');
+  const readingModalTitle = document.getElementById('reading-modal-title');
+  const readingModalList = document.getElementById('reading-modal-list');
+  const readingModalMeta = document.getElementById('reading-modal-meta');
+  const readingModalContent = document.getElementById('reading-modal-content');
 
   const toSafeText = (value) => String(value ?? '');
   const escapeHtml = (value) => toSafeText(value)
@@ -1688,6 +2081,17 @@ Tryna navigate the real and fake</p>
     .replaceAll("'", '&#39;');
   const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
   const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
+  const ACCESS_ROLE_KEY = 'mw-access-role-v1';
+  const VERIFIED_WRITER_EMAIL = 'imutashi2@gmail.com';
+  const FEATURE_ROTATION_MS = 5500;
+  let currentAccessRole = sessionStorage.getItem(ACCESS_ROLE_KEY) || '';
+  let writerVerified = currentAccessRole === 'writer';
+  let writerPreviewingReader = false;
+  let featuredPosts = [];
+  let featuredIndex = 0;
+  let featuredIntervalId = null;
+  let readingCollection = [];
+  let activeReadingId = '';
 
   const formatDate = (isoDate) => new Date(isoDate).toLocaleDateString('en-US', {
     month: 'short',
@@ -1786,6 +2190,7 @@ Tryna navigate the real and fake</p>
     title: post.title,
     theme: post.theme,
     excerpt: post.excerpt || '',
+    body: post.body || post.excerpt || '',
     readTime: post.readTime || '2 min read',
     createdAt: post.createdAt || new Date().toISOString()
   });
@@ -1940,6 +2345,8 @@ Tryna navigate the real and fake</p>
     card.dataset.category = post.theme.toLowerCase();
     card.dataset.format = (post.format || 'poem').toLowerCase();
     card.dataset.entryId = post.id;
+    card.dataset.createdAt = post.createdAt;
+    card.dataset.body = post.body || post.excerpt || '';
     card.innerHTML = `
       <p class="poem-card-tag">${escapeHtml(`${(post.format || 'poem').replace(/^./, (c) => c.toUpperCase())} | ${post.theme}`)}</p>
       <h3 class="poem-card-title">${escapeHtml(post.title)}</h3>
@@ -1972,6 +2379,8 @@ Tryna navigate the real and fake</p>
     poemsGrid.prepend(fragment);
     syncCardCategories();
     enhanceReaderCards();
+    renderCategoryShowcase();
+    startFeaturedRotation();
     applyFilter();
   };
 
@@ -1998,6 +2407,7 @@ Tryna navigate the real and fake</p>
       poem: {
         title: 'Poem title',
         excerpt: 'Write a short excerpt...',
+        body: 'Write the full poem...',
         time: '2 min read',
         button: 'Publish Poem',
         note: 'Now writing: Poem'
@@ -2005,6 +2415,7 @@ Tryna navigate the real and fake</p>
       article: {
         title: 'Article title',
         excerpt: 'Write a short article summary...',
+        body: 'Write the full article...',
         time: '5 min read',
         button: 'Publish Article',
         note: 'Now writing: Article'
@@ -2012,6 +2423,7 @@ Tryna navigate the real and fake</p>
       voice: {
         title: 'Voice piece title',
         excerpt: 'Write a short voice description...',
+        body: 'Write the full voice piece or transcript...',
         time: '4 min listen',
         button: 'Publish Voice',
         note: 'Now writing: Voice'
@@ -2020,6 +2432,7 @@ Tryna navigate the real and fake</p>
     const current = presets[format] || presets.poem;
     authorTitle.placeholder = current.title;
     authorExcerpt.placeholder = current.excerpt;
+    authorBody.placeholder = current.body;
     publishButton.textContent = current.button;
     authorTypeNote.textContent = current.note;
     if (!authorReadTime.value || authorReadTime.dataset.autoDefault === 'true') {
@@ -2037,16 +2450,240 @@ Tryna navigate the real and fake</p>
     authorStudio.classList.remove('is-hidden');
   };
 
+  const hideAuthorStudio = () => {
+    authorStudio.classList.add('is-hidden');
+  };
+
+  const setWriterAccessStatus = (message = '') => {
+    writerAccessStatus.textContent = message;
+  };
+
+  const showWriterAccessForm = () => {
+    writerAccessForm.classList.add('is-visible');
+    setWriterAccessStatus('');
+    writerEmailInput.focus();
+  };
+
+  const hideAccessGate = () => {
+    accessGate.classList.add('is-hidden');
+    accessGate.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  const showAccessGate = () => {
+    accessGate.classList.remove('is-hidden');
+    accessGate.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const setWriterPreviewMode = (enabled) => {
+    writerPreviewingReader = enabled && writerVerified;
+    if (writerVerified) {
+      writerEntry.classList.remove('is-hidden');
+      writerEntry.textContent = writerPreviewingReader ? 'Return to Writer Studio' : 'Write a poem';
+      previewReaderViewBtn.textContent = writerPreviewingReader ? 'Back to Writer Studio' : 'Preview Reader View';
+    }
+
+    if (writerPreviewingReader) {
+      hideAuthorStudio();
+    }
+  };
+
+  const applyAccessRole = (role) => {
+    currentAccessRole = role;
+    writerVerified = role === 'writer';
+    writerPreviewingReader = false;
+    if (role) {
+      sessionStorage.setItem(ACCESS_ROLE_KEY, role);
+    } else {
+      sessionStorage.removeItem(ACCESS_ROLE_KEY);
+    }
+
+    const isWriter = role === 'writer';
+    writerEntry.classList.toggle('is-hidden', !isWriter);
+    writerEntry.textContent = 'Write a poem';
+    previewReaderViewBtn.textContent = 'Preview Reader View';
+    if (writerAccessTrigger) writerAccessTrigger.hidden = role === 'reader';
+
+    if (isWriter) {
+      hideAccessGate();
+      revealAuthorStudio();
+    } else {
+      hideAuthorStudio();
+      if (role === 'reader') {
+        hideAccessGate();
+      } else {
+        showAccessGate();
+      }
+    }
+  };
+
+  const formatThemeName = (theme) => {
+    const normalized = String(theme || '').trim().toLowerCase();
+    return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Uncategorized';
+  };
+
+  const setThemeFilter = (theme) => {
+    themeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.theme === theme));
+    applyFilter();
+  };
+
+  const excerptToFeatureLines = (excerpt) => {
+    const words = toSafeText(excerpt).replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    if (!words.length) return 'A new featured piece is on the way.';
+    const lines = [];
+    for (let i = 0; i < Math.min(words.length, 28); i += 7) {
+      lines.push(words.slice(i, i + 7).join(' '));
+    }
+    return lines.slice(0, 4).join('\n');
+  };
+
+  const getCardExcerpt = (card) => {
+    const excerptEl = card.querySelector('.poem-card-excerpt');
+    return excerptEl ? excerptEl.textContent.trim() : '';
+  };
+
+  const getCardBody = (card) => {
+    return card.dataset.body || getCardExcerpt(card);
+  };
+
+  const getCardMeta = (card) => {
+    const meta = Array.from(card.querySelectorAll('.poem-card-meta span')).map((node) => node.textContent.trim());
+    return {
+      date: meta[0] || '',
+      readTime: meta[1] || ''
+    };
+  };
+
+  const collectCardModels = () => Array.from(document.querySelectorAll('.poem-card')).map((card, index) => {
+    const title = card.querySelector('.poem-card-title')?.textContent?.trim() || `Untitled ${index + 1}`;
+    const tagText = card.querySelector('.poem-card-tag')?.textContent?.trim() || '';
+    const parts = tagText.split(/[|·]/).map((item) => item.trim());
+    const meta = getCardMeta(card);
+    return {
+      id: card.dataset.entryId || `card-${index + 1}`,
+      title,
+      excerpt: getCardExcerpt(card),
+      body: getCardBody(card),
+      format: (card.dataset.format || parts[0] || 'poem').toLowerCase(),
+      theme: (card.dataset.category || parts[1] || 'all').toLowerCase(),
+      readTime: meta.readTime,
+      createdAt: card.dataset.createdAt || meta.date || ''
+    };
+  });
+
+  const refreshFeaturedPosts = () => {
+    featuredPosts = collectCardModels().filter((post) => post.excerpt);
+    if (!featuredPosts.length) return;
+    if (featuredIndex >= featuredPosts.length) featuredIndex = 0;
+    const featured = featuredPosts[featuredIndex];
+    featuredLabel.textContent = `Featured ${formatThemeName(featured.format)}`;
+    featuredTitle.textContent = featured.title;
+    featuredLines.textContent = excerptToFeatureLines(featured.excerpt);
+    featuredReadMore.textContent = `Explore ${formatThemeName(featured.theme)} →`;
+  };
+
+  const startFeaturedRotation = () => {
+    refreshFeaturedPosts();
+    if (featuredIntervalId) clearInterval(featuredIntervalId);
+    if (featuredPosts.length <= 1) return;
+    featuredIntervalId = setInterval(() => {
+      featuredIndex = (featuredIndex + 1) % featuredPosts.length;
+      refreshFeaturedPosts();
+    }, FEATURE_ROTATION_MS);
+  };
+
+  const renderCategoryShowcase = () => {
+    const posts = collectCardModels();
+    const grouped = new Map();
+    posts.forEach((post) => {
+      const theme = post.theme || 'all';
+      if (theme === 'all') return;
+      if (!grouped.has(theme)) grouped.set(theme, []);
+      grouped.get(theme).push(post);
+    });
+
+    categoryShowcaseGrid.innerHTML = '';
+    Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0])).forEach(([theme, items]) => {
+      const card = document.createElement('article');
+      card.className = 'category-showcase-card';
+      const previewItems = items.slice(0, 2).map((item) => `
+        <div class="category-showcase-item">
+          <strong>${escapeHtml(item.title)}</strong>
+          <span>${escapeHtml(formatThemeName(item.format))} • ${escapeHtml(item.readTime || 'Quick read')}</span>
+        </div>
+      `).join('');
+      card.innerHTML = `
+        <p class="category-showcase-label">Theme</p>
+        <h3 class="category-showcase-title">${escapeHtml(formatThemeName(theme))}</h3>
+        <div class="category-showcase-list">${previewItems}</div>
+        <button class="btn-ghost" type="button" data-explore-theme="${escapeHtml(theme)}">Explore Poems</button>
+      `;
+      categoryShowcaseGrid.appendChild(card);
+    });
+  };
+
+  const closeReadingModal = () => {
+    readingModal.classList.remove('is-open');
+    readingModal.setAttribute('aria-hidden', 'true');
+    readingCollection = [];
+    activeReadingId = '';
+    document.body.style.overflow = '';
+  };
+
+  const renderReadingSelection = (entryId) => {
+    activeReadingId = entryId;
+    const selected = readingCollection.find((item) => item.id === entryId) || readingCollection[0];
+    if (!selected) {
+      readingModalMeta.innerHTML = '<p class="reading-modal-empty">No writing available yet.</p>';
+      readingModalContent.innerHTML = '<p class="reading-modal-empty">Check back soon for new pieces.</p>';
+      return;
+    }
+
+    activeReadingId = selected.id;
+    readingModalList.querySelectorAll('.reading-modal-item').forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.readingId === selected.id);
+    });
+
+    readingModalMeta.innerHTML = `
+      <span>${escapeHtml(formatThemeName(selected.theme))}</span>
+      <span>${escapeHtml(formatThemeName(selected.format))}</span>
+      <span>${escapeHtml(selected.readTime || 'Quick read')}</span>
+      <span>${escapeHtml(selected.createdAt || 'Recent')}</span>
+    `;
+    readingModalContent.textContent = selected.body || selected.excerpt || 'No writing available for this entry yet.';
+  };
+
+  const openReadingModal = ({ title, kicker, items, activeId }) => {
+    readingCollection = items;
+    readingModalKicker.textContent = kicker;
+    readingModalTitle.textContent = title;
+    readingModalList.innerHTML = items.map((item) => `
+      <button class="reading-modal-item" type="button" data-reading-id="${escapeHtml(item.id)}">
+        <strong>${escapeHtml(item.title)}</strong>
+        <span>${escapeHtml(formatThemeName(item.format))} • ${escapeHtml(item.readTime || 'Quick read')}</span>
+      </button>
+    `).join('');
+    renderReadingSelection(activeId || items[0]?.id || '');
+    readingModal.classList.add('is-open');
+    readingModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
   const applyFilter = () => {
     const currentTheme = activeTheme();
     const currentFormat = activeFormat();
+    let visibleCount = 0;
     document.querySelectorAll('.poem-card').forEach((card) => {
       const category = (card.dataset.category || '').toLowerCase();
       const format = (card.dataset.format || 'poem').toLowerCase();
       const matchesTheme = currentTheme === 'all' || category === currentTheme;
       const matchesFormat = currentFormat === 'all' || format === currentFormat;
-      card.style.display = (matchesTheme && matchesFormat) ? '' : 'none';
+      const isVisible = matchesTheme && matchesFormat;
+      card.style.display = isVisible ? '' : 'none';
+      if (isVisible) visibleCount += 1;
     });
+    poemsGridStatus.textContent = `Showing ${visibleCount} piece${visibleCount === 1 ? '' : 's'} for ${currentTheme === 'all' ? 'all themes' : currentTheme} and ${currentFormat === 'all' ? 'all formats' : currentFormat}.`;
   };
 
   const closeMobileNav = () => {
@@ -2073,7 +2710,10 @@ Tryna navigate the real and fake</p>
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeMobileNav();
+    if (event.key === 'Escape') {
+      closeMobileNav();
+      closeReadingModal();
+    }
   });
 
   document.querySelectorAll('a[href="#"]').forEach((link) => {
@@ -2096,9 +2736,7 @@ Tryna navigate the real and fake</p>
 
   themeButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      themeButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      applyFilter();
+      setThemeFilter(btn.dataset.theme || 'all');
     });
   });
 
@@ -2114,11 +2752,112 @@ Tryna navigate the real and fake</p>
     });
   });
 
+  readerAccessBtn.addEventListener('click', () => {
+    applyAccessRole('reader');
+    setFormatFilter('all');
+    setThemeFilter('all');
+    document.getElementById('poems')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  writerAccessBtn.addEventListener('click', showWriterAccessForm);
+  writerAccessTrigger?.addEventListener('click', () => {
+    showAccessGate();
+    showWriterAccessForm();
+  });
+
+  writerAccessForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const submittedEmail = writerEmailInput.value.trim().toLowerCase();
+    if (submittedEmail !== VERIFIED_WRITER_EMAIL) {
+      setWriterAccessStatus('That email is not authorized for writer access.');
+      return;
+    }
+
+    writerAccessForm.reset();
+    setWriterAccessStatus('');
+    applyAccessRole('writer');
+    setFormatFilter('poem');
+    setThemeFilter('all');
+    authorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
   writerEntry.addEventListener('click', (event) => {
     event.preventDefault();
+    if (currentAccessRole !== 'writer') {
+      showAccessGate();
+      showWriterAccessForm();
+      return;
+    }
+    setWriterPreviewMode(false);
     revealAuthorStudio();
     setFormatFilter('poem');
     authorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  previewReaderViewBtn.addEventListener('click', () => {
+    if (!writerVerified) return;
+    const nextState = !writerPreviewingReader;
+    setWriterPreviewMode(nextState);
+    if (nextState) {
+      setFormatFilter('all');
+      setThemeFilter('all');
+      document.getElementById('poems')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    setFormatFilter('poem');
+    authorStudio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  categoryShowcaseGrid.addEventListener('click', (event) => {
+    const exploreButton = event.target.closest('[data-explore-theme]');
+    if (!exploreButton) return;
+    const theme = exploreButton.dataset.exploreTheme || 'all';
+    const items = collectCardModels().filter((item) => item.theme === theme);
+    openReadingModal({
+      title: `${formatThemeName(theme)} Collection`,
+      kicker: 'Explore Poems',
+      items,
+      activeId: items[0]?.id || ''
+    });
+  });
+
+  resetPoemFiltersBtn.addEventListener('click', () => {
+    setThemeFilter('all');
+    setFormatFilter('all');
+  });
+
+  showAllPoemsBtn.addEventListener('click', () => {
+    setThemeFilter('all');
+    setFormatFilter('all');
+    poemsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  featuredReadMore.addEventListener('click', (event) => {
+    event.preventDefault();
+    const featured = featuredPosts[featuredIndex];
+    if (!featured) {
+      document.getElementById('poems')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const items = collectCardModels().filter((item) => item.theme === featured.theme);
+    openReadingModal({
+      title: `${formatThemeName(featured.theme)} Collection`,
+      kicker: 'Featured Reading',
+      items,
+      activeId: featured.id
+    });
+  });
+
+  readingModalList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-reading-id]');
+    if (!button) return;
+    renderReadingSelection(button.dataset.readingId);
+  });
+
+  readingModalClose.addEventListener('click', closeReadingModal);
+
+  readingModal.addEventListener('click', (event) => {
+    if (event.target === readingModal) closeReadingModal();
   });
 
   aboutAuthorImage?.addEventListener('click', () => {
@@ -2135,7 +2874,23 @@ Tryna navigate the real and fake</p>
   });
 
   poemsGrid.addEventListener('click', async (event) => {
+    const cardLink = event.target.closest('.poem-card');
     const actionButton = event.target.closest('[data-reader-action]');
+    if (cardLink && !actionButton && !event.target.closest('[data-comment-form]')) {
+      event.preventDefault();
+      const entryId = toEntryId(cardLink);
+      const items = collectCardModels().filter((item) => {
+        const cardTheme = (cardLink.dataset.category || '').toLowerCase();
+        return item.theme === cardTheme;
+      });
+      openReadingModal({
+        title: `${formatThemeName(cardLink.dataset.category || 'all')} Collection`,
+        kicker: 'Reader View',
+        items: items.length ? items : collectCardModels(),
+        activeId: entryId
+      });
+      return;
+    }
     if (!actionButton) return;
 
     event.preventDefault();
@@ -2215,14 +2970,19 @@ Tryna navigate the real and fake</p>
 
   authorForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (currentAccessRole !== 'writer') {
+      setStatus('Writer access is required to publish.');
+      return;
+    }
     const format = authorFormat.value.trim();
     const title = authorTitle.value.trim();
     const theme = document.getElementById('author-theme').value.trim();
     const excerpt = authorExcerpt.value.trim();
+    const body = authorBody.value.trim();
     const readTime = authorReadTime.value.trim() || '2 min read';
 
-    if (!title || !theme || !excerpt) {
-      setStatus('Please fill in title, theme, and excerpt.');
+    if (!title || !theme || !excerpt || !body) {
+      setStatus('Please fill in title, theme, excerpt, and full body.');
       return;
     }
 
@@ -2233,6 +2993,7 @@ Tryna navigate the real and fake</p>
         title,
         theme,
         excerpt,
+        body,
         readTime,
         createdAt: new Date().toISOString()
       });
@@ -2284,10 +3045,13 @@ Tryna navigate the real and fake</p>
 
   syncCardCategories();
   enhanceReaderCards();
+  renderCategoryShowcase();
   authorReadTime.dataset.autoDefault = 'true';
   updateAuthorForm();
-  if (window.location.hash === '#author-studio') revealAuthorStudio();
+  applyAccessRole(currentAccessRole);
+  if (window.location.hash === '#author-studio' && currentAccessRole === 'writer') revealAuthorStudio();
   setBackendMode('PostgreSQL (Node API)');
+  startFeaturedRotation();
   renderSavedPosts();
   refreshSubscribers();
 
