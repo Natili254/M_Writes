@@ -1,29 +1,23 @@
 const http = require('http');
 const fs = require('fs');
-const fsp = require('fs/promises');
 const path = require('path');
 const { randomUUID } = require('crypto');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
-const { Pool } = require('pg');
+
+const {
+  ensureDatabase,
+  fetchPosts,
+  createPost,
+  clearPosts,
+  fetchSubscribers,
+  createSubscriber,
+  fetchLatestDispatch,
+  createMonthlyDispatch
+} = require('./supabase-store');
 
 const PORT = Number(process.env.PORT || 3000);
 const BACKEND_DIR = __dirname;
 const FRONTEND_DIR = path.resolve(BACKEND_DIR, '..', 'frontend');
-const FILE_STORE_PATH = path.join(BACKEND_DIR, 'data', 'content.json');
-const hasPostgresConfig = Boolean(process.env.DATABASE_URL || process.env.PGHOST);
-
-let pgPool = null;
-if (hasPostgresConfig) {
-  pgPool = new Pool({
-    connectionString: process.env.DATABASE_URL || undefined,
-    ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined
-  });
-  
-  // Add error listener to pool
-  pgPool.on('error', (err) => {
-    console.error('PostgreSQL pool error:', err);
-  });
-}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -58,7 +52,7 @@ function sendNoContent(res) {
 }
 
 function sendText(res, statusCode, message) {
-  res.writeHead(statusCode, { 
+  res.writeHead(statusCode, {
     'Content-Type': 'text/plain; charset=utf-8',
     'Access-Control-Allow-Origin': '*'
   });
@@ -127,42 +121,6 @@ function normalizePost(input) {
   };
 }
 
-async function ensureFileStore() {
-  await fsp.mkdir(path.dirname(FILE_STORE_PATH), { recursive: true });
-  try {
-    await fsp.access(FILE_STORE_PATH);
-  } catch {
-    await fsp.writeFile(FILE_STORE_PATH, JSON.stringify({ posts: [], subscribers: [] }, null, 2));
-  }
-}
-
-async function readFileStore() {
-  await ensureFileStore();
-  const raw = await fsp.readFile(FILE_STORE_PATH, 'utf8');
-
-  try {
-    const parsed = JSON.parse(raw);
-    return {
-      posts: Array.isArray(parsed.posts) ? parsed.posts : [],
-      subscribers: Array.isArray(parsed.subscribers) ? parsed.subscribers : [],
-      newsletterDispatches: Array.isArray(parsed.newsletterDispatches) ? parsed.newsletterDispatches : []
-    };
-  } catch {
-    return { posts: [], subscribers: [], newsletterDispatches: [] };
-  }
-}
-
-async function writeFileStore(data) {
-  await ensureFileStore();
-  const payload = {
-    posts: Array.isArray(data.posts) ? data.posts : [],
-    subscribers: Array.isArray(data.subscribers) ? data.subscribers : [],
-    newsletterDispatches: Array.isArray(data.newsletterDispatches) ? data.newsletterDispatches : []
-  };
-
-  await fsp.writeFile(FILE_STORE_PATH, JSON.stringify(payload, null, 2));
-}
-
 function serveStatic(req, res, pathname) {
   const requested = pathname === '/' ? '/index.html' : pathname;
   const decodedPath = decodeURIComponent(requested);
@@ -186,7 +144,7 @@ function serveStatic(req, res, pathname) {
   });
 }
 
-async function handleApi(req, res) {
+async function handlePosts(req, res) {
   if (req.method === 'OPTIONS') {
     sendNoContent(res);
     return;
@@ -197,7 +155,6 @@ async function handleApi(req, res) {
       const posts = await fetchPosts();
       sendJson(res, 200, posts);
     } catch (error) {
-      console.error('GET /api/posts error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to load posts.' });
     }
     return;
@@ -213,13 +170,8 @@ async function handleApi(req, res) {
       }
 
       const post = await createPost(normalized);
-      if (!post) {
-        sendJson(res, 500, { error: 'Failed to create post.' });
-        return;
-      }
       sendJson(res, 201, post);
     } catch (error) {
-      console.error('POST /api/posts error:', error);
       const statusCode = error.message === 'Invalid JSON body' || error.message === 'Payload too large'
         ? 400
         : 500;
@@ -233,7 +185,6 @@ async function handleApi(req, res) {
       await clearPosts();
       sendNoContent(res);
     } catch (error) {
-      console.error('DELETE /api/posts error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to clear posts.' });
     }
     return;
@@ -242,408 +193,13 @@ async function handleApi(req, res) {
   sendJson(res, 405, { error: 'Method not allowed' });
 }
 
-async function ensureDatabase() {
-  if (!pgPool) {
-    console.log('Using file-based storage');
-    await ensureFileStore();
-    return;
-  }
-
-  try {
-    // Test the connection
-    const result = await pgPool.query('SELECT NOW()');
-    console.log('✓ PostgreSQL connection successful');
-
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS posts (
-        id UUID PRIMARY KEY,
-        format TEXT NOT NULL DEFAULT 'poem',
-        title TEXT NOT NULL,
-        theme TEXT NOT NULL,
-        excerpt TEXT NOT NULL,
-        body TEXT NOT NULL DEFAULT '',
-        read_time TEXT NOT NULL DEFAULT '2 min read',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
-
-    await pgPool.query(`
-      ALTER TABLE posts
-      ADD COLUMN IF NOT EXISTS body TEXT NOT NULL DEFAULT ''
-    `);
-
-    await pgPool.query(`
-      CREATE INDEX IF NOT EXISTS posts_created_at_idx
-      ON posts (created_at DESC)
-    `);
-
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS subscribers (
-        id UUID PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
-
-    await pgPool.query(`
-      CREATE INDEX IF NOT EXISTS subscribers_subscribed_at_idx
-      ON subscribers (subscribed_at DESC)
-    `);
-
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS newsletter_dispatches (
-        id UUID PRIMARY KEY,
-        month_key TEXT UNIQUE NOT NULL,
-        sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        mode TEXT NOT NULL DEFAULT 'manual',
-        subscriber_count INTEGER NOT NULL DEFAULT 0,
-        post_id UUID NOT NULL,
-        post_title TEXT NOT NULL,
-        post_theme TEXT NOT NULL,
-        post_format TEXT NOT NULL DEFAULT 'poem',
-        excerpt TEXT NOT NULL DEFAULT '',
-        subject TEXT NOT NULL
-      )
-    `);
-
-    await pgPool.query(`
-      CREATE INDEX IF NOT EXISTS newsletter_dispatches_sent_at_idx
-      ON newsletter_dispatches (sent_at DESC)
-    `);
-
-    console.log('✓ PostgreSQL tables are ready');
-  } catch (error) {
-    console.error('✗ PostgreSQL connection failed:', error.message);
-    console.error('Falling back to file-based storage');
-    pgPool = null;
-    await ensureFileStore();
-  }
-}
-
-async function fetchPosts() {
-  if (!pgPool) {
-    const store = await readFileStore();
-    return [...store.posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }
-
-  const { rows } = await pgPool.query(`
-    SELECT id, format, title, theme, excerpt, body, read_time, created_at
-    FROM posts
-    ORDER BY created_at DESC
-  `);
-  return rows.map((row) => ({
-    id: row.id,
-    format: row.format || 'poem',
-    title: row.title,
-    theme: row.theme,
-    excerpt: row.excerpt,
-    body: row.body || row.excerpt,
-    readTime: row.read_time,
-    createdAt: row.created_at
-  }));
-}
-
-async function createPost(post) {
-  if (!pgPool) {
-    const store = await readFileStore();
-    store.posts.unshift(post);
-    await writeFileStore(store);
-    return post;
-  }
-
-  const { rows } = await pgPool.query(`
-    INSERT INTO posts (id, format, title, theme, excerpt, body, read_time, created_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING id, format, title, theme, excerpt, body, read_time, created_at
-  `, [post.id, post.format, post.title, post.theme, post.excerpt, post.body, post.readTime, post.createdAt]);
-
-  const row = rows[0];
-  if (!row) return null;
-
-  return {
-    id: row.id,
-    format: row.format || 'poem',
-    title: row.title,
-    theme: row.theme,
-    excerpt: row.excerpt,
-    body: row.body || row.excerpt,
-    readTime: row.read_time,
-    createdAt: row.created_at
-  };
-}
-
-async function clearPosts() {
-  if (!pgPool) {
-    const store = await readFileStore();
-    store.posts = [];
-    await writeFileStore(store);
-    return;
-  }
-
-  await pgPool.query('DELETE FROM posts');
-}
-
-async function fetchSubscribers() {
-  if (!pgPool) {
-    const store = await readFileStore();
-    return [...store.subscribers].sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt));
-  }
-
-  const { rows } = await pgPool.query(`
-    SELECT email, subscribed_at
-    FROM subscribers
-    ORDER BY subscribed_at DESC
-  `);
-  return rows.map((row) => ({
-    email: row.email,
-    subscribedAt: row.subscribed_at
-  }));
-}
-
-async function createSubscriber(email) {
-  if (!pgPool) {
-    const store = await readFileStore();
-    const existing = store.subscribers.find((subscriber) => subscriber.email === email);
-    if (existing) return null;
-
-    const subscriber = {
-      email,
-      subscribedAt: new Date().toISOString()
-    };
-
-    store.subscribers.unshift(subscriber);
-    await writeFileStore(store);
-    return subscriber;
-  }
-
-  const id = typeof randomUUID === 'function'
-    ? randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-  try {
-    const { rows } = await pgPool.query(`
-      INSERT INTO subscribers (id, email)
-      VALUES ($1, $2)
-      ON CONFLICT (email) DO NOTHING
-      RETURNING email, subscribed_at
-    `, [id, email]);
-
-    return rows[0] || null;
-  } catch (error) {
-    console.error('Database error in createSubscriber:', error);
-    throw error;
-  }
-}
-
-function toMonthKey(date = new Date()) {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  return `${year}-${month}`;
-}
-
-function buildDispatchSnapshot(post, subscriberCount, mode) {
-  const sentAt = new Date().toISOString();
-  return {
-    id: typeof randomUUID === 'function'
-      ? randomUUID()
-      : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    monthKey: toMonthKey(new Date(sentAt)),
-    sentAt,
-    mode,
-    subscriberCount,
-    postId: post.id,
-    postTitle: post.title,
-    postTheme: post.theme,
-    postFormat: post.format || 'poem',
-    excerpt: post.excerpt,
-    subject: `Monthly poem: ${post.title}`
-  };
-}
-
-async function fetchLatestDispatch() {
-  if (!pgPool) {
-    const store = await readFileStore();
-    return [...store.newsletterDispatches]
-      .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt))[0] || null;
-  }
-
-  const { rows } = await pgPool.query(`
-    SELECT id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
-    FROM newsletter_dispatches
-    ORDER BY sent_at DESC
-    LIMIT 1
-  `);
-  const row = rows[0];
-  if (!row) return null;
-  return {
-    id: row.id,
-    monthKey: row.month_key,
-    sentAt: row.sent_at,
-    mode: row.mode,
-    subscriberCount: row.subscriber_count,
-    postId: row.post_id,
-    postTitle: row.post_title,
-    postTheme: row.post_theme,
-    postFormat: row.post_format,
-    excerpt: row.excerpt,
-    subject: row.subject
-  };
-}
-
-async function createMonthlyDispatch(mode = 'manual') {
-  const monthKey = toMonthKey();
-  const subscribers = await fetchSubscribers();
-  const posts = await fetchPosts();
-  const featuredPost = posts.find((post) => post.format === 'poem') || posts[0];
-
-  if (!subscribers.length) {
-    return { created: false, reason: 'no-subscribers', dispatch: null };
-  }
-  if (!featuredPost) {
-    return { created: false, reason: 'no-posts', dispatch: null };
-  }
-
-  if (!pgPool) {
-    const store = await readFileStore();
-    const existing = store.newsletterDispatches.find((dispatch) => dispatch.monthKey === monthKey);
-    if (existing) return { created: false, reason: 'already-sent', dispatch: existing };
-
-    const dispatch = buildDispatchSnapshot(featuredPost, subscribers.length, mode);
-    store.newsletterDispatches.unshift(dispatch);
-    await writeFileStore(store);
-    return { created: true, reason: 'sent', dispatch };
-  }
-
-  const { rows: existingRows } = await pgPool.query(`
-    SELECT id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
-    FROM newsletter_dispatches
-    WHERE month_key = $1
-    LIMIT 1
-  `, [monthKey]);
-  if (existingRows[0]) {
-    const row = existingRows[0];
-    return {
-      created: false,
-      reason: 'already-sent',
-      dispatch: {
-        id: row.id,
-        monthKey: row.month_key,
-        sentAt: row.sent_at,
-        mode: row.mode,
-        subscriberCount: row.subscriber_count,
-        postId: row.post_id,
-        postTitle: row.post_title,
-        postTheme: row.post_theme,
-        postFormat: row.post_format,
-        excerpt: row.excerpt,
-        subject: row.subject
-      }
-    };
-  }
-
-  const dispatch = buildDispatchSnapshot(featuredPost, subscribers.length, mode);
-  const { rows } = await pgPool.query(`
-    INSERT INTO newsletter_dispatches (
-      id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    RETURNING id, month_key, sent_at, mode, subscriber_count, post_id, post_title, post_theme, post_format, excerpt, subject
-  `, [
-    dispatch.id,
-    dispatch.monthKey,
-    dispatch.sentAt,
-    dispatch.mode,
-    dispatch.subscriberCount,
-    dispatch.postId,
-    dispatch.postTitle,
-    dispatch.postTheme,
-    dispatch.postFormat,
-    dispatch.excerpt,
-    dispatch.subject
-  ]);
-  const row = rows[0];
-  return {
-    created: true,
-    reason: 'sent',
-    dispatch: {
-      id: row.id,
-      monthKey: row.month_key,
-      sentAt: row.sent_at,
-      mode: row.mode,
-      subscriberCount: row.subscriber_count,
-      postId: row.post_id,
-      postTitle: row.post_title,
-      postTheme: row.post_theme,
-      postFormat: row.post_format,
-      excerpt: row.excerpt,
-      subject: row.subject
-    }
-  };
-}
-
-async function getDispatchStatus() {
-  const latestDispatch = await fetchLatestDispatch();
-  const subscribers = await fetchSubscribers();
-  const posts = await fetchPosts();
-  const currentMonth = toMonthKey();
-  const sentThisMonth = latestDispatch?.monthKey === currentMonth;
-  return {
-    currentMonth,
-    sentThisMonth,
-    subscriberCount: subscribers.length,
-    postCount: posts.length,
-    latestDispatch
-  };
-}
-
-async function handleNewsletterDispatchApi(req, res) {
+async function handleSubscribers(req, res) {
   if (req.method === 'OPTIONS') {
     sendNoContent(res);
     return;
   }
 
   if (req.method === 'GET') {
-    try {
-      const status = await getDispatchStatus();
-      sendJson(res, 200, status);
-    } catch (error) {
-      console.error('GET /api/newsletter/dispatch error:', error);
-      sendJson(res, 500, { error: error.message || 'Failed to load newsletter dispatch status.' });
-    }
-    return;
-  }
-
-  if (req.method === 'POST') {
-    try {
-      const payload = await parseRequestBody(req);
-      const mode = payload?.mode === 'auto' ? 'auto' : 'manual';
-      const result = await createMonthlyDispatch(mode);
-      const status = await getDispatchStatus();
-      sendJson(res, 200, {
-        ...status,
-        created: result.created,
-        reason: result.reason,
-        latestDispatch: result.dispatch || status.latestDispatch
-      });
-    } catch (error) {
-      console.error('POST /api/newsletter/dispatch error:', error);
-      sendJson(res, 500, { error: error.message || 'Failed to create newsletter dispatch.' });
-    }
-    return;
-  }
-
-  sendJson(res, 405, { error: 'Method not allowed' });
-}
-
-async function handleSubscribersApi(req, res) {
-  if (req.method === 'OPTIONS') {
-    console.log('OPTIONS request to /api/subscribers');
-    sendNoContent(res);
-    return;
-  }
-
-  if (req.method === 'GET') {
-    console.log('GET /api/subscribers');
     try {
       const subscribers = await fetchSubscribers();
       sendJson(res, 200, {
@@ -651,37 +207,28 @@ async function handleSubscribersApi(req, res) {
         subscribers
       });
     } catch (error) {
-      console.error('GET /api/subscribers error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to load subscribers.' });
     }
     return;
   }
 
   if (req.method === 'POST') {
-    console.log('POST /api/subscribers');
     try {
       const payload = await parseRequestBody(req);
-      console.log('Request payload:', payload);
-      
       const email = normalizeEmail(payload.email);
       if (!email) {
-        console.log('Invalid email provided:', payload.email);
         sendJson(res, 400, { error: 'A valid email is required.' });
         return;
       }
 
-      console.log('Creating subscriber for:', email);
       const created = await createSubscriber(email);
       const subscribers = await fetchSubscribers();
-      
-      console.log('Subscriber created:', created !== null, 'Total subscribers:', subscribers.length);
       sendJson(res, 201, {
         created: Boolean(created),
         count: subscribers.length,
         subscribers
       });
     } catch (error) {
-      console.error('POST /api/subscribers error:', error);
       sendJson(res, 500, { error: error.message || 'Failed to save subscriber.' });
     }
     return;
@@ -690,39 +237,86 @@ async function handleSubscribersApi(req, res) {
   sendJson(res, 405, { error: 'Method not allowed' });
 }
 
+async function handleNewsletterDispatch(req, res) {
+  if (req.method === 'OPTIONS') {
+    sendNoContent(res);
+    return;
+  }
+
+  if (req.method === 'GET') {
+    try {
+      const [latestDispatch, subscribers, posts] = await Promise.all([
+        fetchLatestDispatch(),
+        fetchSubscribers(),
+        fetchPosts()
+      ]);
+      const monthKey = new Date().toISOString().slice(0, 7);
+      sendJson(res, 200, {
+        sentThisMonth: latestDispatch?.monthKey === monthKey,
+        latestDispatch,
+        subscriberCount: subscribers.length,
+        postCount: posts.length
+      });
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Failed to load newsletter dispatch status.' });
+    }
+    return;
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const payload = await parseRequestBody(req);
+      const mode = payload.mode === 'auto' ? 'auto' : 'manual';
+      const result = await createMonthlyDispatch(mode);
+      const [latestDispatch, subscribers, posts] = await Promise.all([
+        fetchLatestDispatch(),
+        fetchSubscribers(),
+        fetchPosts()
+      ]);
+      sendJson(res, 200, {
+        ...result,
+        latestDispatch,
+        subscriberCount: subscribers.length,
+        postCount: posts.length
+      });
+    } catch (error) {
+      sendJson(res, 500, { error: error.message || 'Failed to create newsletter dispatch.' });
+    }
+    return;
+  }
+
+  sendJson(res, 405, { error: 'Method not allowed' });
+}
+
 const server = http.createServer(async (req, res) => {
+  try {
+    await ensureDatabase();
+  } catch (error) {
+    sendJson(res, 500, { error: error.message || 'Failed to initialize Supabase.' });
+    return;
+  }
+
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname;
 
-  console.log(`${req.method} ${pathname}`);
-
   if (pathname === '/api/posts') {
-    await handleApi(req, res);
+    await handlePosts(req, res);
     return;
   }
 
   if (pathname === '/api/subscribers') {
-    await handleSubscribersApi(req, res);
+    await handleSubscribers(req, res);
     return;
   }
 
   if (pathname === '/api/newsletter/dispatch') {
-    await handleNewsletterDispatchApi(req, res);
+    await handleNewsletterDispatch(req, res);
     return;
   }
 
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    sendText(res, 405, 'Method Not Allowed');
-    return;
-  }
   serveStatic(req, res, pathname);
 });
 
-server.listen(PORT, async () => {
-  try {
-    await ensureDatabase();
-  } catch (error) {
-    console.error('✗ Failed to initialize storage:', error.message);
-  }
-  console.log(`\n🚀 Server running at http://localhost:${PORT}\n`);
+server.listen(PORT, () => {
+  console.log(`Mutashi Writes server running on http://localhost:${PORT}`);
 });

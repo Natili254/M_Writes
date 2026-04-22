@@ -595,17 +595,6 @@
     font-size: .76rem;
     color: var(--sage);
   }
-  .dispatch-panel {
-    border-top: 1px solid var(--dust);
-    margin-top: 1.1rem;
-    padding-top: 1rem;
-  }
-  .dispatch-status {
-    font-size: .8rem;
-    line-height: 1.7;
-    color: #4a3f35;
-    margin-bottom: .9rem;
-  }
   .poem-card.user-post {
     border-left: 3px solid var(--gold);
   }
@@ -621,6 +610,26 @@
     background: rgba(244, 234, 220, 0.86);
     border: 1px solid rgba(190, 163, 124, 0.5);
     padding: 1.3rem;
+  }
+  .collection-empty-state {
+    background: rgba(244, 234, 220, 0.82);
+    border: 1px dashed rgba(190, 163, 124, 0.88);
+    padding: 1.5rem;
+    color: #4c4137;
+  }
+  .collection-empty-state p + p {
+    margin-top: .65rem;
+  }
+  .collection-empty-state strong {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: .45rem;
+    color: var(--ink);
+  }
+  .poems-grid .collection-empty-state {
+    grid-column: 1 / -1;
   }
   .category-showcase-card .btn-ghost {
     width: 100%;
@@ -1718,7 +1727,6 @@
       </ul>
     </li>
     <li><a href="#about">About</a></li>
-    <li><a href="#events">Events</a></li>
     <li><a href="#contact">Contact</a></li>
     <li class="nav-mobile-subscribe"><a href="#newsletter">Subscribe</a></li>
   </ul>
@@ -1748,14 +1756,11 @@
     <div class="hero-texture"></div>
     <div class="hero-poem-card">
       <p class="poem-label" id="featured-label">&#10022; Featured Lines</p>
-      <h2 class="poem-title" id="featured-title">Nabayet - Otile Brown</h2>
+      <h2 class="poem-title" id="featured-title">A new featured piece will appear here.</h2>
       <div class="poem-lines" id="featured-lines">
-        Nimejaliwa moyo wa upendo<br>
-        Nikipenda napendaga vibaya<br>
-        Ila scandal zimefanya sija settle<br>
-        Sina hamu nazo kisa wewe mama<br>
+        Sign in as the verified writer and publish a poem, article, or voice piece to fill this space with original writing.
       </div>
-      <a href="#poems" class="poem-read-more" id="featured-read-more">Read full poem &rarr;</a>
+      <a href="#poems" class="poem-read-more" id="featured-read-more">Explore the library &rarr;</a>
     </div>
   </div>
 </section>
@@ -1837,13 +1842,6 @@
       </ul>
       <p class="subscriber-status" id="subscriber-status"></p>
     </div>
-    <div class="dispatch-panel">
-      <div class="subscriber-head">
-        <p class="subscriber-count">Monthly Dispatch</p>
-        <button class="btn-ghost" type="button" id="send-monthly-dispatch">Send This Month's Poem</button>
-      </div>
-      <p class="dispatch-status" id="dispatch-status">Monthly dispatch status will appear here.</p>
-    </div>
   </div>
 
   <div class="filter-bar fade-up">
@@ -1858,7 +1856,7 @@
 
   <div class="category-showcase fade-up" id="category-showcase">
     <div class="poems-grid-toolbar">
-      <p class="poems-grid-status">A few recent pieces from each category.</p>
+      <p class="poems-grid-status">Few of Mutashi's writes from each category.</p>
       <div class="poems-grid-actions">
         <button class="btn-ghost" type="button" id="show-all-poems">Show all writing</button>
       </div>
@@ -1874,61 +1872,11 @@
   </div>
 
   <div class="poems-grid fade-up">
-    <a class="poem-card" href="#" data-format="poem">
-      <p class="poem-card-tag">Poem &middot; Healing</p>
-      <h3 class="poem-card-title">After the Storm, I Made Tea</h3>
-      <p class="poem-card-excerpt">I didn't know healing looked like this - quiet, ordinary, steam rising from a cup while the world outside forgot to stop...</p>
-      <div class="poem-card-meta"><span>Feb 14, 2025</span><span>2 min read</span></div>
-    </a>
-    
-    <a class="poem-card" href="#" data-format="article">
-      <p class="poem-card-tag">Article &middot; Identity</p>
-      <h3 class="poem-card-title">The Name I Chose for Myself</h3>
-      <p class="poem-card-excerpt">not the name they pinned on me at birth - a different one, earned in the dark, the one that fits the shape of my becoming...</p>
-      <div class="poem-card-meta"><span>Jan 10, 2025</span><span>6 min read</span></div>
-    </a>
-    <a class="poem-card" href="#" data-format="article">
-      <p class="poem-card-tag">Article &middot; Love</p>
-      <h3 class="poem-card-title">When Love Stops Performing</h3>
-      <p class="poem-card-excerpt">A reflective essay on tenderness, boundaries, and the quiet difference between being admired and being truly known.</p>
-      <div class="poem-card-meta"><span>Mar 3, 2025</span><span>5 min read</span></div>
-    </a>
-    <a class="poem-card" href="#" data-format="voice">
-      <p class="poem-card-tag">Voice &middot; Spiritual</p>
-      <h3 class="poem-card-title">Prayer Between Two Breaths</h3>
-      <p class="poem-card-excerpt">A spoken-word piece on faith, surrender, and the sound of healing when language is almost too small for it.</p>
-      <div class="poem-card-meta"><span>Feb 2, 2025</span><span>4 min listen</span></div>
-    </a>
-    <a class="poem-card" href="#" data-format="article">
-      <p class="poem-card-tag">Article &middot; Love</p>
-      <h3 class="poem-card-title">I love her again - Jcole</h3>
-      <p class="poem-card-excerpt">Back when I was just a jit hangin' on thе strip (Boom)<br>
-She's the girl that I would see in evеry nigga's whip (Boom)<br>
-I was much too young to truly know what constitutes<br>
-The difference 'tween the girl next door and or a prostitute (Yeah)<br>
-I heard some older brothers say they knew her from before<br>
-She lost her common sense when niggas</p>
-      <div class="poem-card-meta"><span>Dec 31, 2024</span><span>5 min read</span></div>
-    </a>
-    <a class="poem-card" href="#" data-format="poem">
-      <p class="poem-card-tag">Poem &middot; Spiritual</p>
-      <h3 class="poem-card-title">Reincarnated by Kendrick Lamar</h3>
-      <p class="poem-card-excerpt">I got this fire burnin' in me from within<br>
-Concentrated thoughts on who I used to be, I'm sheddin' skin
-Every day, a new version of me, a third of me demented, cemented in pain
-Juggling the pros and cons of fame
-I don't know how to make friends, I'm a lonely soul
-I recollect this isolation, I was four years old
-Truth be told, I've been battling myself
-Tryna navigate the real and fake</p>
-      <div class="poem-card-meta"><span>Dec 18, 2024</span><span>3 min read</span></div>
-    </a>
-    <a class="poem-card" href="#" data-format="article">
-      <p class="poem-card-tag">Article &middot; Loss</p>
-      <h3 class="poem-card-title">What Grief Taught Me to Keep</h3>
-      <p class="poem-card-excerpt">grief is a hoarder - it keeps everything: the way you laughed, the specific weight of your absence on a Tuesday afternoon...</p>
-      <div class="poem-card-meta"><span>Nov 29, 2024</span><span>7 min read</span></div>
-    </a>
+    <div class="collection-empty-state" id="poems-empty-state">
+      <strong>No published writing yet.</strong>
+      <p>This library stays empty until the verified writer logs in and publishes original work.</p>
+      <p>Once a poem, article, or voice piece is published, it will appear here automatically.</p>
+    </div>
   </div>
 </section>
 
@@ -2032,9 +1980,8 @@ Tryna navigate the real and fake</p>
     || (((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       && window.location.port !== '3000')
       ? 'http://localhost:3000'
-      : 'https://m-writes.onrender.com');
+      : window.location.origin);
   const POSTS_API_URL = `${API_BASE_URL}/api/posts`;
-  const NEWSLETTER_DISPATCH_API_URL = `${API_BASE_URL}/api/newsletter/dispatch`;
 
   const poemsGrid = document.querySelector('.poems-grid');
   const navElement = document.querySelector('nav');
@@ -2068,8 +2015,6 @@ Tryna navigate the real and fake</p>
   const subscriberCountEl = document.getElementById('subscriber-count');
   const subscriberListEl = document.getElementById('subscriber-list');
   const subscriberStatusEl = document.getElementById('subscriber-status');
-  const sendMonthlyDispatchBtn = document.getElementById('send-monthly-dispatch');
-  const dispatchStatusEl = document.getElementById('dispatch-status');
   const backendMode = document.getElementById('backend-mode');
   const accessGate = document.getElementById('access-gate');
   const readerAccessBtn = document.getElementById('reader-access-btn');
@@ -2077,7 +2022,9 @@ Tryna navigate the real and fake</p>
   const writerAccessForm = document.getElementById('writer-access-form');
   const writerEmailInput = document.getElementById('writer-email');
   const writerAccessStatus = document.getElementById('writer-access-status');
+  const categoryShowcase = document.getElementById('category-showcase');
   const categoryShowcaseGrid = document.getElementById('category-showcase-grid');
+  const poemsEmptyState = document.getElementById('poems-empty-state');
   const resetPoemFiltersBtn = document.getElementById('reset-poem-filters');
   const showAllPoemsBtn = document.getElementById('show-all-poems');
   const poemsGridStatus = document.getElementById('poems-grid-status');
@@ -2103,8 +2050,6 @@ Tryna navigate the real and fake</p>
   const generatePostId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
   const READER_INTERACTIONS_KEY = 'mw-reader-interactions-v1';
   const ACCESS_ROLE_KEY = 'mw-access-role-v1';
-  const SUBSCRIBERS_CACHE_KEY = 'mw-subscribers-cache-v1';
-  const DISPATCH_STATUS_CACHE_KEY = 'mw-dispatch-status-cache-v1';
   const VERIFIED_WRITER_EMAIL = 'imutashi2@gmail.com';
   const FEATURE_ROTATION_MS = 5500;
   let currentAccessRole = sessionStorage.getItem(ACCESS_ROLE_KEY) || '';
@@ -2149,39 +2094,9 @@ Tryna navigate the real and fake</p>
     }, 2800);
   };
 
-  const loadCachedSubscribers = () => {
-    try {
-      const cached = JSON.parse(localStorage.getItem(SUBSCRIBERS_CACHE_KEY) || '{}');
-      return cached && typeof cached === 'object' ? cached : { count: 0, subscribers: [] };
-    } catch {
-      return { count: 0, subscribers: [] };
-    }
-  };
-
-  const saveCachedSubscribers = (payload) => {
-    localStorage.setItem(SUBSCRIBERS_CACHE_KEY, JSON.stringify({
-      count: Number(payload?.count ?? (Array.isArray(payload?.subscribers) ? payload.subscribers.length : 0)),
-      subscribers: Array.isArray(payload?.subscribers) ? payload.subscribers : []
-    }));
-  };
-
-  const loadCachedDispatchStatus = () => {
-    try {
-      const cached = JSON.parse(localStorage.getItem(DISPATCH_STATUS_CACHE_KEY) || 'null');
-      return cached && typeof cached === 'object' ? cached : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const saveCachedDispatchStatus = (payload) => {
-    localStorage.setItem(DISPATCH_STATUS_CACHE_KEY, JSON.stringify(payload));
-  };
-
   const renderSubscribers = (payload) => {
     const subscribers = Array.isArray(payload?.subscribers) ? payload.subscribers : [];
     subscriberCountEl.textContent = String(payload?.count ?? subscribers.length ?? 0);
-    saveCachedSubscribers({ count: payload?.count, subscribers });
     subscriberListEl.innerHTML = '';
     if (!subscribers.length) {
       const li = document.createElement('li');
@@ -2234,86 +2149,6 @@ Tryna navigate the real and fake</p>
       setSubscriberStatus('Subscribers updated.');
     } catch (error) {
       setSubscriberStatus(error.message || 'Could not load subscribers.');
-    }
-  };
-
-  const renderDispatchStatus = (payload) => {
-    if (!dispatchStatusEl) return;
-    if (payload) saveCachedDispatchStatus(payload);
-    const latest = payload?.latestDispatch;
-    if (!latest) {
-      dispatchStatusEl.textContent = 'No monthly poem has been dispatched yet.';
-      return;
-    }
-    const sentMonth = latest.monthKey || 'this month';
-    dispatchStatusEl.textContent = `${sentMonth} dispatch sent for "${latest.postTitle}" to ${latest.subscriberCount} subscriber${latest.subscriberCount === 1 ? '' : 's'} on ${formatDateTime(latest.sentAt)}.`;
-  };
-
-  const fetchDispatchStatus = async () => {
-    const response = await fetch(NEWSLETTER_DISPATCH_API_URL, { method: 'GET' });
-    if (!response.ok) {
-      if (response.status === 404 || response.status === 405) return null;
-      throw new Error('Unable to load monthly dispatch status.');
-    }
-    return response.json();
-  };
-
-  const createMonthlyDispatch = async (mode = 'manual') => {
-    const response = await fetch(NEWSLETTER_DISPATCH_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode })
-    });
-    if (!response.ok) {
-      let message = 'Monthly dispatch failed.';
-      try {
-        const body = await response.json();
-        if (body?.error) message = body.error;
-      } catch {
-        // keep default message
-      }
-      throw new Error(message);
-    }
-    return response.json();
-  };
-
-  const refreshDispatchStatus = async () => {
-    try {
-      const data = await fetchDispatchStatus();
-      if (!data) {
-        const cached = loadCachedDispatchStatus();
-        if (cached) {
-          renderDispatchStatus(cached);
-        } else {
-          dispatchStatusEl.textContent = 'Monthly dispatch will appear once the backend syncs this feature.';
-        }
-        return null;
-      }
-      renderDispatchStatus(data);
-      return data;
-    } catch (error) {
-      const cached = loadCachedDispatchStatus();
-      if (cached) {
-        renderDispatchStatus(cached);
-      } else {
-        dispatchStatusEl.textContent = 'Monthly dispatch will appear once the backend syncs this feature.';
-      }
-      return null;
-    }
-  };
-
-  const ensureMonthlyDispatchIfDue = async () => {
-    if (currentAccessRole !== 'writer') return;
-    const status = await refreshDispatchStatus();
-    if (!status || status.sentThisMonth || !status.subscriberCount || !status.postCount) return;
-    try {
-      const result = await createMonthlyDispatch('auto');
-      renderDispatchStatus(result);
-      if (result.created) {
-        setSubscriberStatus('Monthly poem dispatch completed automatically.');
-      }
-    } catch (error) {
-      dispatchStatusEl.textContent = error.message || 'Automatic monthly dispatch failed.';
     }
   };
 
@@ -2512,6 +2347,7 @@ Tryna navigate the real and fake</p>
     poemsGrid.prepend(fragment);
     syncCardCategories();
     enhanceReaderCards();
+    updateCollectionEmptyState();
     renderCategoryShowcase();
     startFeaturedRotation();
     applyFilter();
@@ -2705,15 +2541,28 @@ Tryna navigate the real and fake</p>
     };
   });
 
+  const updateCollectionEmptyState = () => {
+    const cards = Array.from(document.querySelectorAll('.poem-card'));
+    if (poemsEmptyState) poemsEmptyState.style.display = cards.length ? 'none' : 'block';
+    if (categoryShowcase) categoryShowcase.style.display = cards.length ? '' : 'none';
+    return cards.length;
+  };
+
   const refreshFeaturedPosts = () => {
     featuredPosts = collectCardModels().filter((post) => post.excerpt);
-    if (!featuredPosts.length) return;
+    if (!featuredPosts.length) {
+      featuredLabel.textContent = 'Featured Writing';
+      featuredTitle.textContent = 'A new featured piece will appear here.';
+      featuredLines.textContent = 'Sign in as the verified writer and publish a poem, article, or voice piece to fill this space with original writing.';
+      featuredReadMore.textContent = 'Explore the library ->';
+      return;
+    }
     if (featuredIndex >= featuredPosts.length) featuredIndex = 0;
     const featured = featuredPosts[featuredIndex];
     featuredLabel.textContent = `Featured ${formatThemeName(featured.format)}`;
     featuredTitle.textContent = featured.title;
     featuredLines.textContent = excerptToFeatureLines(featured.excerpt);
-    featuredReadMore.textContent = `Explore ${formatThemeName(featured.theme)} →`;
+    featuredReadMore.textContent = `Explore ${formatThemeName(featured.theme)} ->`;
   };
 
   const startFeaturedRotation = () => {
@@ -2737,13 +2586,14 @@ Tryna navigate the real and fake</p>
     });
 
     categoryShowcaseGrid.innerHTML = '';
+    if (!grouped.size) return;
     Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0])).forEach(([theme, items]) => {
       const card = document.createElement('article');
       card.className = 'category-showcase-card';
       const previewItems = items.slice(0, 2).map((item) => `
         <div class="category-showcase-item">
           <strong>${escapeHtml(item.title)}</strong>
-          <span>${escapeHtml(formatThemeName(item.format))} • ${escapeHtml(item.readTime || 'Quick read')}</span>
+          <span>${escapeHtml(formatThemeName(item.format))} � ${escapeHtml(item.readTime || 'Quick read')}</span>
         </div>
       `).join('');
       card.innerHTML = `
@@ -2794,7 +2644,7 @@ Tryna navigate the real and fake</p>
     readingModalList.innerHTML = items.map((item) => `
       <button class="reading-modal-item" type="button" data-reading-id="${escapeHtml(item.id)}">
         <strong>${escapeHtml(item.title)}</strong>
-        <span>${escapeHtml(formatThemeName(item.format))} • ${escapeHtml(item.readTime || 'Quick read')}</span>
+        <span>${escapeHtml(formatThemeName(item.format))} � ${escapeHtml(item.readTime || 'Quick read')}</span>
       </button>
     `).join('');
     renderReadingSelection(activeId || items[0]?.id || '');
@@ -2806,8 +2656,9 @@ Tryna navigate the real and fake</p>
   const applyFilter = () => {
     const currentTheme = activeTheme();
     const currentFormat = activeFormat();
+    const cards = Array.from(document.querySelectorAll('.poem-card'));
     let visibleCount = 0;
-    document.querySelectorAll('.poem-card').forEach((card) => {
+    cards.forEach((card) => {
       const category = (card.dataset.category || '').toLowerCase();
       const format = (card.dataset.format || 'poem').toLowerCase();
       const matchesTheme = currentTheme === 'all' || category === currentTheme;
@@ -2816,6 +2667,7 @@ Tryna navigate the real and fake</p>
       card.style.display = isVisible ? '' : 'none';
       if (isVisible) visibleCount += 1;
     });
+    if (poemsEmptyState) poemsEmptyState.style.display = cards.length ? 'none' : 'block';
     poemsGridStatus.textContent = `Showing ${visibleCount} piece${visibleCount === 1 ? '' : 's'} for ${currentTheme === 'all' ? 'all themes' : currentTheme} and ${currentFormat === 'all' ? 'all formats' : currentFormat}.`;
   };
 
@@ -3135,7 +2987,6 @@ Tryna navigate the real and fake</p>
       authorReadTime.dataset.autoDefault = 'true';
       updateAuthorForm();
       await renderSavedPosts();
-      await refreshDispatchStatus();
       setStatus('Published.');
     } catch (error) {
       setStatus(error.message || 'Publish failed.');
@@ -3156,29 +3007,6 @@ Tryna navigate the real and fake</p>
     await refreshSubscribers();
   });
 
-  sendMonthlyDispatchBtn.addEventListener('click', async () => {
-    try {
-      sendMonthlyDispatchBtn.disabled = true;
-      sendMonthlyDispatchBtn.textContent = 'Sending...';
-      const result = await createMonthlyDispatch('manual');
-      renderDispatchStatus(result);
-      if (result.created) {
-        setStatus('Monthly poem dispatched.');
-      } else if (result.reason === 'already-sent') {
-        setStatus('This month has already been dispatched.');
-      } else if (result.reason === 'no-subscribers') {
-        setStatus('No subscribers available yet.');
-      } else if (result.reason === 'no-posts') {
-        setStatus('Publish a poem before dispatching.');
-      }
-    } catch (error) {
-      setStatus(error.message || 'Monthly dispatch failed.');
-    } finally {
-      sendMonthlyDispatchBtn.disabled = false;
-      sendMonthlyDispatchBtn.textContent = 'Send This Month\'s Poem';
-    }
-  });
-
   newsletterForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = newsletterEmail.value.trim().toLowerCase();
@@ -3191,7 +3019,6 @@ Tryna navigate the real and fake</p>
       const data = await createSubscriber(email);
       renderSubscribers(data);
       newsletterForm.reset();
-      await refreshDispatchStatus();
       setSubscriberStatus(data.created ? 'Subscriber added.' : 'Subscriber already exists.');
     } catch (error) {
       setSubscriberStatus(error.message || 'Subscription failed.');
@@ -3204,7 +3031,6 @@ Tryna navigate the real and fake</p>
   syncCardCategories();
   enhanceReaderCards();
   renderCategoryShowcase();
-  renderSubscribers(loadCachedSubscribers());
   authorReadTime.dataset.autoDefault = 'true';
   updateAuthorForm();
   applyAccessRole(currentAccessRole);
@@ -3213,7 +3039,6 @@ Tryna navigate the real and fake</p>
   startFeaturedRotation();
   renderSavedPosts();
   refreshSubscribers();
-  ensureMonthlyDispatchIfDue();
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -3225,4 +3050,11 @@ Tryna navigate the real and fake</p>
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
 
