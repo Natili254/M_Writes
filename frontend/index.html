@@ -2164,7 +2164,10 @@
   });
 
   const fetchRemotePosts = async () => {
-    const response = await fetch(POSTS_API_URL, { method: 'GET' });
+    const response = await fetch(POSTS_API_URL, {
+      method: 'GET',
+      cache: 'no-store'
+    });
     if (!response.ok) throw new Error('API unavailable');
     const posts = await response.json();
     if (!Array.isArray(posts)) throw new Error('Invalid API response');
